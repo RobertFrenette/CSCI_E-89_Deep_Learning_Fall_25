@@ -1,0 +1,14 @@
+# Install with: pip install -r requirements.txt
+
+# Core LLM, RAG, and Vector DB
+langchain==0.3.13
+langchain-community>=0.0.20
+langchain-ollama>=0.0.1
+langchain-text-splitters>=0.0.1
+chromadb>=0.4.22
+
+# PDF Processing
+pypdf>=3.17.0
+
+# Embeddings
+sentence-transformers>=2.2.0

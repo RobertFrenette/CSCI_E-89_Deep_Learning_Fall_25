@@ -1,0 +1,179 @@
+{
+  "timestamp": "2025-11-22T12:16:04.272091",
+  "total_tests": 10,
+  "elapsed_time_seconds": 223.30765008926392,
+  "aggregate": {
+    "total_tests": 10,
+    "successful_tests": 9,
+    "success_rate": 0.9,
+    "rag_tests": 6,
+    "sql_tests": 4,
+    "rag_retrieval_success_rate": 1.0,
+    "rag_avg_context_precision": 0.8888888888888888,
+    "rag_avg_answer_relevance": 0.7666666666666666,
+    "sql_success_rate": 1.0,
+    "sql_avg_result_count": 6.25
+  },
+  "results": [
+    {
+      "test_id": "rag_001",
+      "question": "What is AI Agent Insure?",
+      "type": "rag",
+      "timestamp": "2025-11-22T12:12:22.068869",
+      "metrics": {
+        "context_precision": 1.0,
+        "llm_precision": 1.0,
+        "keyword_precision": 1.0,
+        "answer_relevance": 0.8,
+        "retrieval_successful": true,
+        "precision_threshold": 0.4,
+        "relevance_threshold": 0.5
+      },
+      "retrieved_contexts_count": 4,
+      "generated_answer": "AI Agent Insure is a next-generation insurance provider dedicated to safeguarding companies developing and deploying agentic AI systems, autonomous robotics, advanced RAG pipelines, and AI-native workflows.",
+      "success": true
+    },
+    {
+      "test_id": "rag_002",
+      "question": "What does Agentic AI Liability Insurance cover?",
+      "type": "rag",
+      "timestamp": "2025-11-22T12:12:27.133073",
+      "metrics": {
+        "context_precision": 1.0,
+        "llm_precision": 1.0,
+        "keyword_precision": 1.0,
+        "answer_relevance": 0.9,
+        "retrieval_successful": true,
+        "precision_threshold": 0.4,
+        "relevance_threshold": 0.5
+      },
+      "retrieved_contexts_count": 4,
+      "generated_answer": "According to the provided context, Agentic AI Liability Insurance specifically covers:\n\n1. Harm caused by AI hallucinations, misaligned decision-making, or autonomous task execution.\n2. Protection against regulatory penalties, customer impact, operational disruption, and legal liability.\n3. Coverage for incorrect, misleading, or hallucinated responses from AI agents that impact customers or partners.\n4. Defense costs and settlements related to claims that an AI system caused loss or damage.\n5. Coverage for internal process failures triggered by autonomous agents (e.g., misrouted workflows, incorrect account changes).\n\nAdditionally, the insurance product offers optional coverage add-ons, including:\n\n1. Higher limits for large enterprise deployments or critical decision systems.\n2. Add-on for regulatory investigation support when AI behavior triggers inquiries or audits.\n3. Reputation management and PR support following high-visibility AI incidents.\n4. Coverage extensions for partner or reseller use of the insured\u2019s AI agents.\n\nThe insurance product excludes coverage for:\n\n1. Intentional misuse or deliberate override of AI safeguards by the customer.\n2. Systems operating entirely outside the declared AI footprint or disclosed use cases.\n3. Non-AI related business decisions unrelated to the AI\u2019s recommendations.\n4. Known defects that were not remediated after prior incidents or warnings.",
+      "success": true
+    },
+    {
+      "test_id": "rag_003",
+      "question": "What is Model and Data Security Insurance?",
+      "type": "rag",
+      "timestamp": "2025-11-22T12:12:40.780780",
+      "metrics": {
+        "context_precision": 0.3333333333333333,
+        "llm_precision": 0.75,
+        "keyword_precision": 0.3333333333333333,
+        "answer_relevance": 0.8,
+        "retrieval_successful": true,
+        "precision_threshold": 0.4,
+        "relevance_threshold": 0.5
+      },
+      "retrieved_contexts_count": 4,
+      "generated_answer": "Agentic AI Liability Insurance covers harm caused by autonomous or semi-autonomous AI decisions, including hallucinations, misaligned actions, and faulty recommendations. It provides liability coverage for financial, operational, or reputational harm caused by AI outputs or decisions, as well as coverage for incorrect, misleading, or hallucinated responses from AI agents that impact customers or partners.",
+      "success": false
+    },
+    {
+      "test_id": "rag_004",
+      "question": "What is Intellectual Property and Output Protection?",
+      "type": "rag",
+      "timestamp": "2025-11-22T12:15:25.329466",
+      "metrics": {
+        "context_precision": 1.0,
+        "llm_precision": 1.0,
+        "keyword_precision": 1.0,
+        "answer_relevance": 0.6,
+        "retrieval_successful": true,
+        "precision_threshold": 0.6,
+        "relevance_threshold": 0.6
+      },
+      "retrieved_contexts_count": 4,
+      "generated_answer": "I don't have that information in the available documents.",
+      "success": true
+    },
+    {
+      "test_id": "rag_005",
+      "question": "What does Compliance and Regulatory Shield cover?",
+      "type": "rag",
+      "timestamp": "2025-11-22T12:15:45.951437",
+      "metrics": {
+        "context_precision": 1.0,
+        "llm_precision": 1.0,
+        "keyword_precision": 1.0,
+        "answer_relevance": 0.6,
+        "retrieval_successful": true,
+        "precision_threshold": 0.6,
+        "relevance_threshold": 0.6
+      },
+      "retrieved_contexts_count": 4,
+      "generated_answer": "I don't have that information in the available documents.",
+      "success": true
+    },
+    {
+      "test_id": "rag_006",
+      "question": "What is the difference between Agentic AI Liability Insurance and Model and Data Security Insurance?",
+      "type": "rag",
+      "timestamp": "2025-11-22T12:15:51.030772",
+      "metrics": {
+        "context_precision": 1.0,
+        "llm_precision": 1.0,
+        "keyword_precision": 1.0,
+        "answer_relevance": 0.9,
+        "retrieval_successful": true,
+        "precision_threshold": 0.8,
+        "relevance_threshold": 0.7
+      },
+      "retrieved_contexts_count": 4,
+      "generated_answer": "Based on the provided context, the main difference between Agentic AI Liability Insurance and Model and Data Security Insurance appears to be the scope of coverage:\n\nAgentic AI Liability Insurance focuses on protecting organizations from harm caused by autonomous or semi-autonomous AI decisions, including hallucinations, misaligned actions, and faulty recommendations. It covers liability for financial, operational, or reputational harm caused by AI outputs or decisions.\n\nModel and Data Security Insurance, on the other hand, protects foundational AI assets such as training data, embeddings, fine-tuned models, and inference endpoints from security threats and misuse. It covers incidents involving prompt injection, unauthorized model access, data poisoning events, breaches of embedding stores, and feature databases holding sensitive data.\n\nIn summary, Agentic AI Liability Insurance is concerned with the risks associated with autonomous or semi-autonomous AI decision-making, while Model and Data Security Insurance focuses on protecting AI models and data from security threats and misuse.",
+      "success": true
+    },
+    {
+      "test_id": "sql_001",
+      "question": "How many insureds are there?",
+      "type": "sql",
+      "timestamp": "2025-11-22T12:16:04.266467",
+      "metrics": {
+        "sql_success": true,
+        "result_count": 1
+      },
+      "sql_error": "",
+      "sql_results_sample": "[{'count': 100}]",
+      "success": true
+    },
+    {
+      "test_id": "sql_002",
+      "question": "How many claims are there?",
+      "type": "sql",
+      "timestamp": "2025-11-22T12:16:04.269466",
+      "metrics": {
+        "sql_success": true,
+        "result_count": 1
+      },
+      "sql_error": "",
+      "sql_results_sample": "[{'count': 46}]",
+      "success": true
+    },
+    {
+      "test_id": "sql_003",
+      "question": "What are the high risk policies?",
+      "type": "sql",
+      "timestamp": "2025-11-22T12:16:04.269937",
+      "metrics": {
+        "sql_success": true,
+        "result_count": 22
+      },
+      "sql_error": "",
+      "sql_results_sample": "[{'Insured_ID': '93O5JLNC', 'First_Name': 'James', 'Last_Name': 'Martin', 'Company_Name': 'AICo', 'Industry': 'Healthcare', 'Policy_Number': 'PP4K73C4S', 'Policy_Type': 'Model & Data Security Insurance', 'Policy_Status': 'Active', 'Annual_Premium': 6966.0, 'Risk_Score_Internal': 100, 'AI_System_Type': 'RAG', 'Has_High_Risk_Use_Cases': 'No'}, {'Insured_ID': '3XW05890', 'First_Name': 'Sarah', 'Last_Name': 'Martin', 'Company_Name': 'RoboCorp', 'Industry': 'Insurance', 'Policy_Number': 'PK73RRUCU', 'Policy_Type': 'Compliance & Regulatory Shield', 'Policy_Status': 'Active', 'Annual_Premium': 18681.0, 'Risk_Score_Internal': 99, 'AI_System_Type': 'Robotics', 'Has_High_Risk_Use_Cases': 'Yes'}, {'Insured_ID': 'Y3PQAF1N', 'First_Name': 'Anna', 'Last_Name': 'Walker', 'Company_Name': 'DataLift', 'Industry': 'Finance', 'Policy_Number': 'P7PNNSDSF', 'Policy_Type': 'Model & Data Security Insurance', 'Policy_Status': 'Active', 'Annual_Premium': 3927.0, 'Risk_Score_Internal': 99, 'AI_System_Type': 'RAG', 'Has_High_Risk_Use_Cases': 'Yes'}]",
+      "success": true
+    },
+    {
+      "test_id": "sql_004",
+      "question": "What is the information for insured BQ4DCXWL?",
+      "type": "sql",
+      "timestamp": "2025-11-22T12:16:04.270683",
+      "metrics": {
+        "sql_success": true,
+        "result_count": 1
+      },
+      "sql_error": "",
+      "sql_results_sample": "[{'insured': {'Insured_ID': 'BQ4DCXWL', 'First_Name': 'Sophia', 'Last_Name': 'Brown', 'Date_of_Birth': '1990-05-13', 'Phone_Number': '555-276-6941', 'Email_Address': 'user5653@example.com', 'Address_Line1': '123 Main St', 'Address_Line2': '', 'City': 'Austin', 'State': 'CO', 'Postal_Code': '55405', 'Country': 'USA', 'Company_Name': 'RoboCorp', 'Industry': 'Transportation', 'Contact_Person': ''}, 'policies': [{'Policy_Number': 'P2FUZC2SC', 'Insured_ID': 'BQ4DCXWL', 'Policy_Type': 'Model & Data Security Insurance', 'Effective_Date': '2024-01-01', 'Expiration_Date': '2025-01-01', 'Policy_Status': 'Active', 'Payment_Status': 'Paid', 'Annual_Premium': 7757.0, 'Monthly_Premium': 0.0, 'Payment_Method': 'Credit Card', 'Broker': 'Acme Insurance', 'Discounts_Applied': 'None', 'Coverage_Limit': 1000000, 'Coverage_Tier': 'Enhanced', 'Risk_Score_Internal': 96, 'AI_System_Type': 'Agentic', 'Has_High_Risk_Use_Cases': 'Yes', 'Incident_History_Count': 0}], 'claims': []}]",
+      "success": true
+    }
+  ]
+}

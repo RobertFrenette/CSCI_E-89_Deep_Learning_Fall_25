@@ -1,0 +1,102 @@
+{
+  "test_cases": [
+    {
+      "test_number": 1,
+      "configuration": {
+        "temperature": 0.1,
+        "retrieval_k": 2
+      },
+      "metrics": {
+        "total_tests": 10,
+        "passed": 10,
+        "failed": 0,
+        "success_rate": 1.0
+      },
+      "rag_metrics": {
+        "test_count": 6,
+        "avg_context_precision": 0.94,
+        "avg_answer_relevance": 0.82
+      },
+      "sql_metrics": {
+        "test_count": 4,
+        "success_rate": 1.0,
+        "avg_result_count": 6.2
+      },
+      "elapsed_time": {
+        "seconds": 170.93,
+        "minutes": 2.85
+      }
+    },
+    {
+      "test_number": 2,
+      "configuration": {
+        "temperature": 0.1,
+        "retrieval_k": 4
+      },
+      "metrics": {
+        "total_tests": 10,
+        "passed": 9,
+        "failed": 1,
+        "success_rate": 0.9
+      },
+      "rag_metrics": {
+        "test_count": 6,
+        "avg_context_precision": 0.89,
+        "avg_answer_relevance": 0.77
+      },
+      "sql_metrics": {
+        "test_count": 4,
+        "success_rate": 1.0,
+        "avg_result_count": 6.2
+      },
+      "elapsed_time": {
+        "seconds": 223.31,
+        "minutes": 3.72
+      }
+    },
+    {
+      "test_number": 3,
+      "configuration": {
+        "temperature": 0.1,
+        "retrieval_k": 6
+      },
+      "metrics": {
+        "total_tests": 10,
+        "passed": 8,
+        "failed": 2,
+        "success_rate": 0.8
+      },
+      "rag_metrics": {
+        "test_count": 6,
+        "avg_context_precision": 0.72,
+        "avg_answer_relevance": 0.82
+      },
+      "sql_metrics": {
+        "test_count": 4,
+        "success_rate": 1.0,
+        "avg_result_count": 6.2
+      },
+      "elapsed_time": {
+        "seconds": 81.72,
+        "minutes": 1.36
+      }
+    }
+  ],
+  "summary": {
+    "total_test_cases": 3,
+    "configurations": [
+      {
+        "temperature": 0.1,
+        "retrieval_k": 2
+      },
+      {
+        "temperature": 0.1,
+        "retrieval_k": 4
+      },
+      {
+        "temperature": 0.1,
+        "retrieval_k": 6
+      }
+    ]
+  }
+}

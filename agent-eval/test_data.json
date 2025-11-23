@@ -1,0 +1,135 @@
+{
+  "test_cases": [
+    {
+      "id": "rag_001",
+      "type": "rag",
+      "category": "company_info",
+      "question": "What is AI Agent Insure?",
+      "ground_truth_answer": "AI Agent Insure is a specialized insurance company that provides coverage for AI systems, including agentic AI, autonomous systems, RAG systems, and other AI deployments. They offer various insurance products to protect against AI-related risks and incidents.",
+      "expected_contexts_contain": [
+        "AI Agent Insure",
+        "insurance",
+        "AI systems"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "id": "rag_002",
+      "type": "rag",
+      "category": "products_specific",
+      "question": "What does Agentic AI Liability Insurance cover?",
+      "ground_truth_answer": "Agentic AI Liability Insurance provides coverage for damages caused by autonomous AI agents, including financial losses from agent errors, third-party damages from agent actions, and legal defense costs. It covers incidents where AI agents make decisions or take actions that result in harm or financial loss.",
+      "expected_contexts_contain": [
+        "Agentic AI Liability",
+        "autonomous",
+        "coverage"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "id": "rag_003",
+      "type": "rag",
+      "category": "products_specific",
+      "question": "What is Model and Data Security Insurance?",
+      "ground_truth_answer": "Model and Data Security Insurance covers data breaches, model theft, unauthorized access to training data, intellectual property theft of AI models, costs of incident response and forensics, and regulatory fines related to security incidents.",
+      "expected_contexts_contain": [
+        "Model and Data Security",
+        "data breach",
+        "security"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "id": "rag_004",
+      "type": "rag",
+      "category": "products_specific",
+      "question": "What is Intellectual Property and Output Protection?",
+      "ground_truth_answer": "Intellectual Property and Output Protection covers IP infringement claims from AI-generated content, copyright issues with AI outputs, and legal defense for intellectual property disputes related to AI systems.",
+      "expected_contexts_contain": [
+        "Intellectual Property",
+        "Output Protection",
+        "copyright"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "id": "rag_005",
+      "type": "rag",
+      "category": "compliance",
+      "question": "What does Compliance and Regulatory Shield cover?",
+      "ground_truth_answer": "Compliance and Regulatory Shield provides coverage for regulatory fines, penalties, and legal costs associated with AI regulatory compliance. It helps companies navigate evolving AI regulations, covers costs of regulatory investigations, and provides support for compliance with various AI governance frameworks.",
+      "expected_contexts_contain": [
+        "Compliance",
+        "Regulatory",
+        "fines",
+        "coverage"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "id": "rag_006",
+      "type": "rag",
+      "category": "products_comparison",
+      "question": "What is the difference between Agentic AI Liability Insurance and Model and Data Security Insurance?",
+      "ground_truth_answer": "Agentic AI Liability Insurance covers damages from AI agent actions and decisions, while Model and Data Security Insurance covers data breaches, model theft, and security incidents. One focuses on liability from AI behavior, the other on protecting the AI system and data itself.",
+      "expected_contexts_contain": [
+        "Agentic AI Liability",
+        "Model and Data Security",
+        "coverage",
+        "liability"
+      ],
+      "difficulty": "hard"
+    },
+    {
+      "id": "sql_001",
+      "type": "sql",
+      "category": "count",
+      "question": "How many insureds are there?",
+      "expected_result_count": 1,
+      "expected_contains": ["count"],
+      "difficulty": "easy"
+    },
+    {
+      "id": "sql_002",
+      "type": "sql",
+      "category": "count",
+      "question": "How many claims are there?",
+      "expected_result_count": 1,
+      "expected_contains": ["count"],
+      "difficulty": "easy"
+    },
+    {
+      "id": "sql_003",
+      "type": "sql",
+      "category": "filter",
+      "question": "What are the high risk policies?",
+      "expected_result_count": null,
+      "expected_contains": [],
+      "difficulty": "medium"
+    },
+    {
+      "id": "sql_004",
+      "type": "sql",
+      "category": "lookup",
+      "question": "What is the information for insured BQ4DCXWL?",
+      "expected_result_count": 1,
+      "expected_contains": ["BQ4DCXWL"],
+      "difficulty": "hard"
+    }
+  ],
+  "metadata": {
+    "version": "2.6",
+    "created_date": "2025-11-18",
+    "total_test_cases": 10,
+    "test_categories": {
+      "rag": 6,
+      "sql": 4
+    },
+    "difficulty_distribution": {
+      "easy": 5,
+      "medium": 3,
+      "hard": 2
+    },
+    "description": "Test cases with 3 easy, 2 medium, and 1 hard RAG queries, plus 2 easy, 1 medium, and 1 hard SQL queries."
+  }
+}
