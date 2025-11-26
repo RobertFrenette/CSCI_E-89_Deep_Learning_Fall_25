@@ -1,6 +1,7 @@
 """
 Script to run all data preparation steps for AI Agent Insure project.
 Creates insureds.db and Chroma vector store in one command.
+Called from init.sh script, or can be run standalone.
 """
 import subprocess
 import sys
@@ -16,6 +17,11 @@ steps = [
 ]
 
 def main():
+    """
+    Main function to run all data preparation steps.
+    Executes scripts to create insureds.db and Chroma vector store sequentially.
+    Exits with error code 1 if any step fails.
+    """
     for desc, cmd in steps:
         print(f"\n=== {desc} ===")
         try:

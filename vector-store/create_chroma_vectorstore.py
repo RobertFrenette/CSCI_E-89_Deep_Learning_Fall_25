@@ -3,7 +3,9 @@ Create and populate ChromaDB vector store from PDF documents.
 
 This script reads PDF files from the knowledge-base directory and creates
 a persistent ChromaDB vector store with embeddings for RAG retrieval.
-Optimized for better retrieval quality with enhanced metadata and chunking.
+
+Optimized for better retrieval quality with enhanced metadata and chunking
+by adding document context to each chunk.
 """
 
 import os
@@ -20,14 +22,14 @@ from langchain_community.vectorstores import Chroma
 
 def extract_document_type(rel_path: str, filename: str) -> tuple[str, str]:
     """
-    Extract document type and category from file path.
+    Extract document type and category from file path. Returns tuple.
     
-    Args:
-        rel_path: Relative path from knowledge-base root
-        filename: PDF filename
-        
+    Params:
+    - rel_path: Relative file path from knowledge-base root
+    - filename: Name of the PDF file
+    
     Returns:
-        Tuple of (document_type, document_category)
+    - tuple(document_type, document_category)
     """
     path_parts = Path(rel_path).parts
     
@@ -56,16 +58,15 @@ def extract_document_type(rel_path: str, filename: str) -> tuple[str, str]:
     
     return doc_type, doc_category
 
-
 def clean_text(text: str) -> str:
     """
-    Clean and normalize extracted text for better chunking.
+    Clean and normalize extracted text for better chunking. Returns cleaned text.
     
-    Args:
-        text: Raw extracted text
-        
+    Params:
+    - text: Raw extracted text from PDF
+    
     Returns:
-        Cleaned text with normalized whitespace
+    - Cleaned and normalized text
     """
     if not text:
         return text
@@ -77,19 +78,20 @@ def clean_text(text: str) -> str:
     
     # Remove leading/trailing whitespace
     text = text.strip()
-    
     return text
-
 
 def load_pdfs(pdf_dir: str):
     """
-    Load all PDFs from directory and extract text with enhanced metadata.
+    Load all PDFs from directory and extract text with enhanced metadata. Returns list of document dicts.
     
-    Args:
-        pdf_dir: Directory containing PDF files
-        
+    Params:
+    - pdf_dir: Directory containing PDF files
+    
     Returns:
-        List of document dictionaries with text and enriched metadata
+    - List of document dictionaries with text and metadata
+    
+    Throws:
+    - Exception if PDF loading fails
     """
     documents = []
     pdf_files = glob.glob(f"{pdf_dir}/**/*.pdf", recursive=True)
@@ -141,17 +143,16 @@ def load_pdfs(pdf_dir: str):
     print(f"✅ Successfully loaded {len(documents)} documents")
     return documents
 
-
 def add_document_context(chunk_text: str, doc: dict) -> str:
     """
-    Add document context prefix to chunk for better semantic matching.
+    Add document context prefix to chunk for better semantic matching. Returns chunk text with context.
     
-    Args:
-        chunk_text: The chunk text
-        doc: Document dictionary with metadata
-        
+    Params:
+    - chunk_text: Text of the chunk
+    - doc: Document metadata dictionary
+    
     Returns:
-        Chunk text with document context prefix
+    - Chunk text prefixed with document context
     """
     # Extract document title from filename (remove .pdf, replace _ with spaces)
     doc_title = doc['source'].replace('.pdf', '').replace('_', ' ')
@@ -162,26 +163,15 @@ def add_document_context(chunk_text: str, doc: dict) -> str:
     # Prepend context to chunk
     return context_prefix + chunk_text
 
-
-def split_documents(documents: list, chunk_size: int = 1800, chunk_overlap: int = 350, 
-                   min_chunk_size: int = 50):
+def split_documents(documents: list, chunk_size: int = 1800, chunk_overlap: int = 350, min_chunk_size: int = 50):
     """
-    Split documents into chunks with enhanced metadata and filtering.
-    
-    Args:
-        documents: List of document dictionaries
-        chunk_size: Maximum size of each chunk (improved default: 1800)
-        chunk_overlap: Overlap between chunks (improved default: 350)
-        min_chunk_size: Minimum chunk size to keep (default: 50)
-        
-    Returns:
-        Tuple of (chunks, metadatas) with filtered and enriched data
+    Split documents into chunks with enhanced metadata and filtering. Returns tuple of (chunks, metadatas).
     """
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
         length_function=len,
-        separators=["\n\n", "\n", ". ", " ", ""]  # Better separator priority
+        separators=["\n\n", "\n", ". ", " ", ""]  # Define separator / priority
     )
     
     print(f"📝 Splitting documents into chunks...")
@@ -246,20 +236,18 @@ def split_documents(documents: list, chunk_size: int = 1800, chunk_overlap: int 
     
     return all_chunks, all_metadatas
 
-
-def create_vectorstore(chunks: list, metadatas: list, chroma_dir: str, 
-                       embedding_model: str = "nomic-embed-text"):
+def create_vectorstore(chunks: list, metadatas: list, chroma_dir: str, embedding_model: str = "nomic-embed-text"):
     """
-    Create embeddings and vector store.
+    Create embeddings and vector store in ChromaDB. Returns vector store.
     
-    Args:
-        chunks: List of text chunks
-        metadatas: List of metadata dictionaries
-        chroma_dir: Directory for ChromaDB persistence
-        embedding_model: Name of the Ollama embedding model
-        
+    Params:
+    - chunks: List of text chunks
+    - metadatas: List of metadata dictionaries corresponding to chunks
+    - chroma_dir: Directory to persist ChromaDB vector store
+    - embedding_model: Name of the embedding model to use
+    
     Returns:
-        ChromaDB vector store
+    - Chroma vector store instance
     """
     print("🔄 Creating embeddings and storing in ChromaDB...")
     print(f"   Model: {embedding_model}")
@@ -280,14 +268,16 @@ def create_vectorstore(chunks: list, metadatas: list, chroma_dir: str,
     print("✅ Vector store created successfully!")
     return vectorstore
 
-
 def verify_vectorstore(chroma_dir: str, embedding_model: str = "nomic-embed-text"):
     """
     Verify the created vector store.
     
-    Args:
-        chroma_dir: Directory containing ChromaDB
-        embedding_model: Name of the Ollama embedding model
+    Params:
+    - chroma_dir: Directory where the ChromaDB vector store is persisted
+    - embedding_model: Name of the embedding model used
+    
+    Returns:
+    - Chroma vector store instance
     """
     print("🔍 Verifying vector store...")
     print()
@@ -321,12 +311,23 @@ def verify_vectorstore(chroma_dir: str, embedding_model: str = "nomic-embed-text
         print(f"   {i}. [{doc_type}] {source} (chunk {chunk_idx})")
         print(f"      {preview}...")
     print()
-    
     return vectorstore
 
-
 def show_directory_tree(directory_path: str, prefix: str = "", is_last: bool = True):
-    """Display directory tree structure."""
+    """
+    Display directory tree structure. Recursively prints a visual tree representation.
+    
+    Params:
+    - directory_path: Path to the directory
+    - prefix: Prefix string for tree structure (used in recursion)
+    - is_last: Boolean indicating if the current item is the last in its level
+    
+    Returns:
+    - None
+    
+    Throws:
+    - PermissionError if directory cannot be accessed
+    """
     path_obj = Path(directory_path)
     
     if prefix == "":
@@ -348,9 +349,13 @@ def show_directory_tree(directory_path: str, prefix: str = "", is_last: bool = T
     except PermissionError:
         pass
 
-
 def main():
-    """Main function to create and populate the vector store."""
+    """
+    Main function to create and populate the vector store.
+    
+    Returns:
+    - None
+    """
     print("=" * 70)
     print("Creating AI Agent Insure - Knowledge Base Vector Store")
     print("=" * 70)
@@ -362,7 +367,7 @@ def main():
     pdf_dir = project_root / "knowledge-base"
     chroma_dir = project_root / "vector-store" / "chroma_db"
     
-    # Configuration - Optimized for better RAG retrieval
+    # Configuration - Optimized (after testing)for better RAG retrieval
     CHUNK_SIZE = 1800  # Increased from 1000 for better context preservation
     CHUNK_OVERLAP = 350  # Increased from 200 (~20% overlap for context continuity)
     MIN_CHUNK_SIZE = 50  # Filter out chunks smaller than this
@@ -463,7 +468,6 @@ def main():
     print(f"   cd {project_root / 'agent'}")
     print("   python app.py")
     print()
-
 
 if __name__ == "__main__":
     main()

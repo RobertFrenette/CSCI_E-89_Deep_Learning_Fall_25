@@ -6,13 +6,15 @@ import logging
 from pathlib import Path
 from agent import config
 
-
 def setup_logging():
     """
     Configure application-wide logging.
     
     Sets up handlers for console and/or file logging based on config settings.
     Should be called once at application startup.
+    
+    Returns:
+        None
     """
     handlers = []
     

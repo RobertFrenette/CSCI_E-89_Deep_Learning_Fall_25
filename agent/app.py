@@ -14,6 +14,7 @@ if str(project_root) not in sys.path:
 
 import logging
 import whisper
+import gradio as gr
 from agent.processors.rag_processor import RAGProcessor
 from agent.processors.sql_processor import SQLProcessor
 from agent.logger import setup_logging
@@ -25,12 +26,37 @@ from agent import config
 # Setup logging
 logger = logging.getLogger(__name__)
 
-
 class RAGChatbotApp:
-    """Main application class for the multimodal RAG chatbot."""
+    """
+    Main application class for the multimodal RAG chatbot.
+
+    Attributes:
+        processor: RAGProcessor instance
+        qa_chain: RAG chain
+        memory: Conversation memory
+        vectorstore: ChromaDB vector store
+        whisper_model: Whisper model
+        sql_processor: SQLProcessor instance
+        sql_query_handler: SQLQueryHandler instance
+        query_processor: QueryService instance
+
+    Methods:
+        initialize_audio: Initialize Whisper model for speech-to-text
+        initialize_sql: Initialize SQL database connection and create SQLQueryHandler instance
+        initialize_rag: Initialize the RAG processing system and set up RAG chain
+        process_query: Process user query from text or audio input
+        clear_conversation: Clear conversation memory and reset UI inputs
+        run: Run the complete application. Optionally run a test query
+
+    Raises:
+        RuntimeError: If Whisper model fails to load, SQL database fails to initialize, or RAG system fails to initialize
+        FileNotFoundError: If vector store not found
+    """
     
     def __init__(self):
-        """Initialize the application."""
+        """
+        Initialize the application and set all component attributes to None.
+        """
         self.processor = None
         self.qa_chain = None
         self.memory = None
@@ -41,7 +67,10 @@ class RAGChatbotApp:
         self.query_processor = None
 
     def initialize_audio(self):
-        """Initialize Whisper model for speech-to-text."""
+        """
+        Initialize Whisper model for speech-to-text.
+        Raises RuntimeError if Whisper model fails to load.
+        """
         try:
             logger.info(f"Loading Whisper model: {config.WHISPER_MODEL}")
             self.whisper_model = whisper.load_model(config.WHISPER_MODEL)
@@ -51,7 +80,9 @@ class RAGChatbotApp:
             raise RuntimeError(f"Could not initialize audio processing: {e}")
     
     def initialize_sql(self):
-        """Initialize SQL database connection."""
+        """
+        Initialize SQL database connection and create SQLQueryHandler instance.
+        """
         logger.info("Initializing SQL database...")
         try:
             self.sql_processor = SQLProcessor(config.SQL_DB_PATH)
@@ -76,7 +107,10 @@ class RAGChatbotApp:
             self.sql_query_handler = None
     
     def initialize_rag(self):
-        """Initialize the RAG processing system."""
+        """
+        Initialize the RAG processing system and set up RAG chain.
+        Raises RuntimeError if vector store not found or initialization fails.
+        """
         logger.info("Initializing RAG system...")
         
         try:
@@ -110,15 +144,8 @@ class RAGChatbotApp:
     
     def process_query(self, text_input, audio_input):
         """
-        Process user query from text or audio input.
-        Delegates to QueryProcessor service for orchestration.
-        
-        Args:
-            text_input: Text question from user
-            audio_input: Audio file path from user
-            
-        Returns:
-            Tuple of (cleared_text_input, response_text, audio_response)
+        Process user query from text or audio input. Delegates to QueryProcessor service.
+        Returns tuple of (cleared_text_input, response_text, audio_response).
         """
         if not self.query_processor:
             error_msg = "Query processor not initialized. Please wait for initialization to complete."
@@ -128,7 +155,10 @@ class RAGChatbotApp:
         return self.query_processor.process_query(text_input, audio_input)
     
     def clear_conversation(self):
-        """Clear conversation memory."""
+        """
+        Clear conversation memory and reset UI inputs.
+        Returns tuple of cleared inputs and outputs.
+        """
         try:
             if self.memory:
                 self.memory.clear()
@@ -138,13 +168,9 @@ class RAGChatbotApp:
             logger.error(f"Error clearing conversation: {e}")
             return "", None, "", None
     
-    
     def run(self, run_test=True):
         """
-        Run the complete application.
-        
-        Args:
-            run_test: Whether to run the test query (default: True)
+        Run the complete application. Optionally run a test query.
         """
         print("=" * 60)
         print("🚀 Starting RAG Chatbot Application")
@@ -170,7 +196,7 @@ class RAGChatbotApp:
         # Test query (optional)
         if run_test:
             print("🔍 Running test query...\n")
-            test_question = "What is AI Agent Insure?"
+            test_question = config.EXAMPLE_QUESTIONS[0] if hasattr(config, "EXAMPLE_QUESTIONS") else "What is AI Agent Insure?"
             result = self.processor.query(test_question)
             # Show retrieved chunks with enhanced metadata
             print(f"\n🔍 Retrieved {len(result['source_documents'])} chunks:")
@@ -187,31 +213,31 @@ class RAGChatbotApp:
             print()
         
         # Create and launch Gradio interface
-        print("=" * 60)
+        print(f"🌍 Access the app at: http://{config.SERVER_NAME}:{config.SERVER_PORT}")
         print("🌐 Launching Gradio Interface")
         print("=" * 60)
-        print()
-        
-        demo = create_interface(self)
-        
-        print("✅ Gradio interface ready!")
-        print(f"🌍 Access the app at: http://{config.SERVER_NAME}:{config.SERVER_PORT}")
         print()
         
         # Set favicon using absolute path
         favicon_path = os.path.join(os.path.dirname(__file__), "assets", "favicon.png")
         
+        # Create the Gradio interface
+        demo = create_interface(self)
+        
+        # Launch the interface
         demo.launch(
             share=config.SHARE,
             debug=config.DEBUG,
             server_name=config.SERVER_NAME,
             server_port=config.SERVER_PORT,
-            favicon_path=favicon_path
+            favicon_path=favicon_path,
+            theme=gr.themes.Soft()
         )
 
-
 def main():
-    """Main entry point for the application."""
+    """
+    Main entry point for the application. Sets up logging, creates RAGChatbotApp instance, and launches the application.
+    """
     setup_logging()
     logger.info("Application starting...")
     
@@ -223,7 +249,6 @@ def main():
     except Exception as e:
         logger.critical(f"Fatal error: {e}", exc_info=True)
         raise
-
 
 if __name__ == "__main__":
     main()

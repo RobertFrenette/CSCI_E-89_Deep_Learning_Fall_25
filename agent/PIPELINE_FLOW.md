@@ -9,15 +9,15 @@
 ```
 ⚠️  REQUIRED BEFORE RUNNING THE APP:
 
-1. Databases must be created externally (one-time setup):
+1. Ollama must be running:
+   ollama serve
+
+2. Databases must be created externally (one-time setup):
   cd ../insured-db
   python create_and_seed_insureds_db.py
 
    cd ../vector-store
    python create_chroma_vectorstore.py
-
-2. Ollama must be running:
-   ollama serve
 
 The application requires Ollama for:
   - LLM inference (llama3.2:3b)

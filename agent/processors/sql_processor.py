@@ -1,8 +1,19 @@
 """
 SQL Processor Module
+Instantiates a SQLite database connection and uses it to handle queries.
+Used in the QueryService to handle SQL queries.
 
 Handles SQLite database queries for structured insured data.
 Domain processor for database operations.
+
+Attributes:
+    db_path: Path to the SQLite database file
+    _local: Thread-local storage for connections
+
+Methods:
+    _get_connection: Get or create a connection for the current thread
+    connect: Establish connection to the database for the current thread
+    disconnect: Close database connection for the current thread
 """
 
 import sqlite3
@@ -13,9 +24,19 @@ from typing import List, Dict, Any
 
 logger = logging.getLogger(__name__)
 
-
 class SQLProcessor:
-    """Class for querying the insureds SQLite database (thread-safe)."""
+    """
+    Class for querying the insureds SQLite database (thread-safe).
+
+    Attributes:
+        db_path: Path to the SQLite database file
+        _local: Thread-local storage for connections
+
+    Methods:
+        _get_connection: Get or create a connection for the current thread
+        connect: Establish connection to the database for the current thread
+        disconnect: Close database connection for the current thread
+    """
     
     def __init__(self, db_path: str):
         """
@@ -28,7 +49,18 @@ class SQLProcessor:
         self._local = threading.local()  # Thread-local storage for connections
         
     def _get_connection(self):
-        """Get or create a connection for the current thread."""
+        """
+        Get or create a connection for the current thread.
+        
+        Uses thread-local storage to ensure each thread has its own database connection.
+        
+        Returns:
+            sqlite3.Connection: Database connection for current thread
+            
+        Raises:
+            FileNotFoundError: If database file doesn't exist
+            sqlite3.Error: If connection fails
+        """
         try:
             if not hasattr(self._local, 'connection') or self._local.connection is None:
                 if not Path(self.db_path).exists():
@@ -48,7 +80,17 @@ class SQLProcessor:
             raise
     
     def connect(self):
-        """Establish connection to the database for the current thread."""
+        """
+        Establish connection to the database for the current thread.
+        
+        Creates a new database connection if one doesn't exist for the current thread.
+        
+        Returns:
+            None
+            
+        Raises:
+            Exception: If connection fails
+        """
         try:
             self._get_connection()
             logger.info(f"Connected to database: {self.db_path}")
@@ -57,7 +99,14 @@ class SQLProcessor:
             raise
         
     def disconnect(self):
-        """Close database connection for the current thread."""
+        """
+        Close database connection for the current thread.
+        
+        Closes the thread-local database connection if it exists.
+        
+        Returns:
+            None
+        """
         if hasattr(self._local, 'connection') and self._local.connection:
             self._local.connection.close()
             self._local.connection = None
@@ -66,8 +115,13 @@ class SQLProcessor:
         """
         Return the number of insureds in the database.
         
+        Executes SQL COUNT query on insureds table.
+        
         Returns:
-            Count of insureds
+            int: Count of insureds in the database
+            
+        Raises:
+            sqlite3.Error: If query execution fails
         """
         try:
             connection = self._get_connection()
@@ -84,8 +138,13 @@ class SQLProcessor:
         """
         Return the number of claims filed in the database.
         
+        Executes SQL COUNT query on claims_history table.
+        
         Returns:
-            Count of claims
+            int: Count of claims in the database
+            
+        Raises:
+            sqlite3.Error: If query execution fails
         """
         try:
             connection = self._get_connection()
@@ -217,10 +276,29 @@ class SQLProcessor:
             raise
     
     def __enter__(self):
-        """Context manager entry."""
+        """
+        Context manager entry.
+        
+        Establishes database connection when entering 'with' block.
+        
+        Returns:
+            SQLProcessor: Self instance
+        """
         self.connect()
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """Context manager exit."""
+        """
+        Context manager exit.
+        
+        Closes database connection when exiting 'with' block.
+        
+        Args:
+            exc_type: Exception type (if any)
+            exc_val: Exception value (if any)
+            exc_tb: Exception traceback (if any)
+            
+        Returns:
+            None
+        """
         self.disconnect()

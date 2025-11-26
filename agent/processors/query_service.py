@@ -1,5 +1,7 @@
 """
 Query Service
+Instantiates the RAGProcessor and SQLProcessor instances and uses them to handle queries.
+Used in the app.py to handle queries.
 
 Service layer that orchestrates the complete query processing pipeline:
 - Input handling (audio/text)
@@ -31,6 +33,17 @@ class QueryService:
     - Query execution via domain processors
     - Response formatting
     - Audio response generation (for RAG queries)
+
+    Attributes:
+        whisper_model: Loaded Whisper model for speech-to-text
+        sql_query_handler: SQLQueryHandler instance (can be None)
+        rag_processor: RAGProcessor instance for document queries
+
+    Methods:
+        process_query: Process user query from text or audio input
+        _handle_input: Handle input processing (audio transcription or text extraction)
+        _process_sql_query: Process SQL database query
+        _process_rag_query: Process RAG document query
     """
     
     def __init__(
@@ -46,6 +59,9 @@ class QueryService:
             whisper_model: Loaded Whisper model for speech-to-text
             sql_query_handler: SQLQueryHandler instance (can be None)
             rag_processor: RAGProcessor instance for document queries
+            
+        Returns:
+            None
         """
         self.whisper_model = whisper_model
         self.sql_query_handler = sql_query_handler
@@ -204,4 +220,3 @@ class QueryService:
         except Exception as e:
             logger.error(f"RAG query failed: {e}", exc_info=True)
             raise RuntimeError(f"Document search error: {str(e)}")
-

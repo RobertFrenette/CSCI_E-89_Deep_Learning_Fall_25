@@ -34,16 +34,20 @@ from agent.config import (
 )
 from agent.processors.rag_processor import RAGProcessor
 
-
 class RAGEvaluator:
-    """Evaluates RAG system performance using various metrics.
+    """
+    Evaluates RAG system performance using various metrics.
     
     Uses the actual RAGProcessor from agent.processors.rag_processor to test
     the full pipeline (retrieval + generation + source validation).
     """
     
     def __init__(self):
-        """Initialize evaluator with actual RAGProcessor from agent app."""
+        """
+        Initialize evaluator with actual RAGProcessor from agent app.
+        
+        Throws RuntimeError if initialization fails.
+        """
         # Initialize LLM for evaluation (separate from RAG processor)
         self.llm = ChatOllama(
             model=LLM_MODEL,
@@ -79,7 +83,13 @@ class RAGEvaluator:
         """
         Evaluate if retrieved contexts are relevant to answering the question.
         
-        Returns a score from 0-1 indicating precision.
+        Params:
+            question (str): The question being asked.
+            retrieved_contexts (List[str]): List of retrieved context strings.
+            ground_truth_answer (str): The known correct answer to the question.
+        
+        Returns:
+            float: Precision score from 0-1 indicating relevance of contexts.
         """
         if not retrieved_contexts:
             return 0.0
@@ -120,9 +130,14 @@ Answer:"""
         answer: str
     ) -> float:
         """
-        Evaluate if the answer is relevant to the question.
+        Evaluate if the answer is relevant to the question. Returns score from 0-1.
         
-        Returns a score from 0-1 indicating relevancy.
+        Params:
+            question (str): The question being asked.
+            answer (str): The answer to evaluate.
+        
+        Returns:
+            float: Relevancy score from 0-1.
         """
         eval_prompt = PromptTemplate(
             input_variables=["question", "answer"],
@@ -158,13 +173,16 @@ Score (just the number):"""
         """
         Execute SQL query routing and validate results.
         
-        Args:
-            question: The question that should trigger SQL routing
-            expected_result_count: Expected number of results (optional)
-            expected_contains: Values that should appear in results (optional)
+        Params:
+            question (str): The question being asked.
+            expected_result_count (int, optional): Expected number of results.
+            expected_contains (List[str], optional): List of strings expected to be in results.
         
         Returns:
-            Tuple of (success, results, error_message)
+            Tuple[bool, List[Any], str]: (success flag, results list, error message)
+            
+        Throws:
+            Exception: On SQL execution errors.
         """
         from agent.processors.sql_processor import SQLProcessor
         
@@ -218,8 +236,6 @@ Score (just the number):"""
         except Exception as e:
             return False, [], str(e)
     
-
-
 def evaluate_test_case(
     evaluator: RAGEvaluator,
     test_case: Dict[str, Any]
@@ -227,14 +243,15 @@ def evaluate_test_case(
     """
     Evaluate a single test case using the full RAG pipeline.
     
-    Tests the actual RAGProcessor pipeline: retrieval → generation → source validation.
-    
-    Args:
-        evaluator: RAGEvaluator instance
-        test_case: Test case dictionary with question, type, ground_truth, etc.
+    Params:
+        evaluator (RAGEvaluator): The evaluator instance to use.
+        test_case (Dict[str, Any]): The test case data.
     
     Returns:
-        Dictionary with evaluation results and metrics
+        Dict[str, Any]: Evaluation results and metrics.
+    
+    Throws:
+        Exception: On evaluation errors.
     """
     question = test_case["question"]
     test_type = test_case["type"]
@@ -342,9 +359,16 @@ def evaluate_test_case(
     
     return result
 
-
 def calculate_aggregate_metrics(results: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Calculate aggregate metrics across all test cases."""
+    """
+    Calculate aggregate metrics across all test cases.
+    
+    Params:
+        results (List[Dict[str, Any]]): List of individual test case results.
+    
+    Returns:
+        Dict[str, Any]: Aggregate metrics including success rates and averages.
+    """
     total_tests = len(results)
     successful_tests = sum(1 for r in results if r.get("success", False))
     
