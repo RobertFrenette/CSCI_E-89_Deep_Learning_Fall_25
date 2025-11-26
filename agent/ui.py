@@ -7,12 +7,11 @@ import os
 import gradio as gr
 from agent import config
 
-
 def create_interface(app):
     """
     Create and configure the Gradio interface.
     
-    Args:
+    Params:
         app: RAGChatbotApp instance with methods: process_query, clear_conversation
     
     Returns:
@@ -20,11 +19,11 @@ def create_interface(app):
     """
     logo_path = os.path.join(os.path.dirname(__file__), "assets", "shield.png")
     
-    with gr.Blocks(theme="soft", title="AI Agent Insure - Agent Assist") as demo:
+    with gr.Blocks(title="AI Agent Insure - Agent Assist") as demo:
         # Header with logo and title side by side
         with gr.Row():
             with gr.Column(scale=1, min_width=100):
-                gr.Image(logo_path, show_label=False, show_download_button=False, 
+                gr.Image(logo_path, show_label=False, 
                         container=False, height=80, width=80)
             with gr.Column(scale=9):
                 gr.Markdown(f"# {config.APP_TITLE}")
@@ -77,4 +76,3 @@ def create_interface(app):
         )
     
     return demo
-

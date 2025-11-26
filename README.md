@@ -15,18 +15,23 @@ Repo for the CSCI E-89 Deep Learning Final Project (Fall '25, Harvard Extension 
 
 ## 🎬 Video Links
 
-- Short Video: TBD
-- Long Video: TBD
+- Intro: TBD
+- [Demo](https://youtu.be/V0mAQjiUK6Q)
+- [Local Setup and Execution](https://youtu.be/Z-3NUKS5HLE)
+- Code Walkthrough: TBD
 
 ## 🛠️ Technologies Used
 
-- [Ollama](https://ollama.com/): Local LLM hosting and inference
+- [Ollama](https://ollama.com/): Local LLM hosting server
+- [llama3.2:3b](https://ollama.com/library/llama3.2): LLM
+- [nomic-embed-text](https://ollama.com/library/nomic-embed-text): Embedding Model
 - [LangChain](https://langchain.com/): Framework for developing applications powered by language models
 - [Chroma](https://www.trychroma.com/): Vector database for storing and retrieving embeddings
 - [Gradio](https://gradio.app/): Framework for building machine learning and data science web apps
 
 ## 📖 Resources
 
+- 📗 [Ollama Crash Course: Build Local LLM powered Apps](https://www.amazon.com/Ollama-Crash-Course-Build-powered/dp/B0DXFVV41K)
 - 📗 [Build a Large Language Model (From Scratch)](https://www.amazon.com/Build-Large-Language-Model-Scratch/dp/1633437167)
 - 📗 [Agentic AI Systems with LangChain + MCP + RAG + Ollama: Build Real-World Intelligent Agents with Modular Tools, Local LLMs, and Retrieval-Augmented Reasoning](https://www.amazon.com/dp/B0F6KRKH2D)
 
@@ -43,6 +48,7 @@ Repo for the CSCI E-89 Deep Learning Final Project (Fall '25, Harvard Extension 
 4. Required Ollama models (will be pulled automatically if not present):
    - `llama3.2:3b` (for LLM inference)
    - `nomic-embed-text` (for embeddings)
+5. **[ffmpeg](https://www.ffmpeg.org/)**: `brew install ffmpeg` (macOS)
 
 ### Initialization
 

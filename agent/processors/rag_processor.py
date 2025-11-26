@@ -1,5 +1,7 @@
 """
 RAG Processor Module
+Instantiates a ChromaDB vector store and uses it to handle RAG queries.
+Used in the QueryService to handle RAG queries.
 
 Handles PDF loading, text chunking, embeddings, and RAG chain setup.
 Domain processor for document-based retrieval and generation.
@@ -19,17 +21,37 @@ from langchain.prompts import PromptTemplate
 
 logger = logging.getLogger(__name__)
 
-
 class RAGProcessor:
-    """Main class for processing documents and setting up RAG system."""
+    """
+    Main class for processing documents and setting up RAG system.
+
+    Attributes:
+        pdf_dir: Path to the directory containing the PDFs
+        chroma_dir: Path to the directory containing the ChromaDB vector store
+        documents: List of document dicts
+        all_chunks: List of all text chunks
+        all_metadatas: List of all metadata
+        vectorstore: ChromaDB vector store
+        qa_chain: RAG chain
+        memory: Conversation memory
+
+    Methods:
+        list_tree: Display directory tree structure
+        load_pdfs: Load all PDFs from directory and extract text
+        split_text: Split documents into chunks using RecursiveCharacterTextSplitter
+        create_vectorstore: Create embeddings and vector store in ChromaDB
+        load_existing_vectorstore: Load existing ChromaDB vector store from disk
+        setup_rag_chain: Setup RAG chain with conversation memory and optimized retrieval
+        preprocess_query: Preprocess query for better retrieval
+        get_answer_with_sources: Query RAG system and return formatted answer with enriched sources
+        query: Query the RAG system and print formatted results to console with sources
+        load_and_setup: Load existing vector store and setup RAG chain with optimized settings
+        process_all: Run the complete pipeline: load PDFs, chunk, create vectorstore, setup RAG chain
+    """
     
     def __init__(self, pdf_dir: str, chroma_dir: str = None):
         """
-        Initialize the RAG processor.
-        
-        Args:
-            pdf_dir: Directory containing PDF files
-            chroma_dir: Directory for ChromaDB persistence
+        Initialize the RAG processor with PDF and ChromaDB directories.
         """
         self.pdf_dir = pdf_dir
         # Use config.CHROMA_DIR if not provided
@@ -43,7 +65,9 @@ class RAGProcessor:
         self.memory = None
         
     def list_tree(self, directory_path: str = None, indent: str = ""):
-        """Display directory tree structure."""
+        """
+        Display directory tree structure. Recursively prints a visual tree representation.
+        """
         if directory_path is None:
             directory_path = self.pdf_dir
             
@@ -60,7 +84,9 @@ class RAGProcessor:
                 print(f"{indent}    📄 {p.name}")
     
     def load_pdfs(self):
-        """Load all PDFs from directory and extract text."""
+        """
+        Load all PDFs from directory and extract text. Returns list of document dicts.
+        """
         self.documents = []
         pdf_files = glob.glob(f"{self.pdf_dir}/**/*.pdf", recursive=True)
         
@@ -86,14 +112,14 @@ class RAGProcessor:
         logger.info(f"Successfully loaded {len(self.documents)} documents")
         return self.documents
     
-    def split_text(self, chunk_size: int = 1000, chunk_overlap: int = 200):
+    def split_text(self, chunk_size: int = None, chunk_overlap: int = None):
         """
-        Split documents into chunks.
-        
-        Args:
-            chunk_size: Maximum size of each chunk
-            chunk_overlap: Overlap between chunks
+        Split documents into chunks using RecursiveCharacterTextSplitter.
+        Returns tuple of (all_chunks, all_metadatas).
         """
+        from agent import config
+        chunk_size = chunk_size if chunk_size is not None else config.CHUNK_SIZE
+        chunk_overlap = chunk_overlap if chunk_overlap is not None else config.CHUNK_OVERLAP
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
@@ -122,13 +148,12 @@ class RAGProcessor:
         
         return self.all_chunks, self.all_metadatas
     
-    def create_vectorstore(self, embedding_model: str = "nomic-embed-text"):
+    def create_vectorstore(self, embedding_model: str = None):
         """
-        Create embeddings and vector store.
-        
-        Args:
-            embedding_model: Name of the Ollama embedding model
+        Create embeddings and vector store in ChromaDB.
         """
+        from agent import config
+        embedding_model = embedding_model if embedding_model is not None else config.EMBEDDING_MODEL
         embeddings = OllamaEmbeddings(model=embedding_model)
         
         print("🔄 Creating embeddings and storing in ChromaDB...")
@@ -146,13 +171,12 @@ class RAGProcessor:
         
         return self.vectorstore
     
-    def load_existing_vectorstore(self, embedding_model: str = "nomic-embed-text"):
+    def load_existing_vectorstore(self, embedding_model: str = None):
         """
-        Load existing vector store from disk.
-        
-        Args:
-            embedding_model: Name of the Ollama embedding model
+        Load existing ChromaDB vector store from disk.
         """
+        from agent import config
+        embedding_model = embedding_model if embedding_model is not None else config.EMBEDDING_MODEL
         embeddings = OllamaEmbeddings(model=embedding_model)
         self.vectorstore = Chroma(
             persist_directory=self.chroma_dir,
@@ -161,19 +185,15 @@ class RAGProcessor:
         print(f"✅ Loaded existing vector store with {self.vectorstore._collection.count()} vectors")
         return self.vectorstore
     
-    def setup_rag_chain(self, llm_model: str = "llama3.2:3b", temperature: float = 0.7, 
-                       k: int = 4, score_threshold: float = None):
+    def setup_rag_chain(self, llm_model: str = None, temperature: float = None, 
+                       k: int = None, score_threshold: float = None):
         """
-        Setup RAG chain with conversation memory, optimized retrieval, and hallucination reduction.
-        
-        Uses strict prompt engineering and score threshold filtering to minimize hallucinations.
-        
-        Args:
-            llm_model: Name of the Ollama LLM model
-            temperature: LLM temperature setting (lower = more focused, less hallucination)
-            k: Number of documents to retrieve (default: 4 to minimize noise)
-            score_threshold: Minimum similarity score threshold (default: 0.7 to filter low-relevance chunks)
+        Setup RAG chain with conversation memory and optimized retrieval.
         """
+        from agent import config
+        llm_model = llm_model if llm_model is not None else config.LLM_MODEL
+        temperature = temperature if temperature is not None else config.TEMPERATURE
+        k = k if k is not None else config.RETRIEVAL_K
         # Initialize Ollama LLM with timeout settings for faster failures
         llm = ChatOllama(
             model=llm_model,
@@ -246,29 +266,15 @@ Answer:"""
     
     def preprocess_query(self, question: str) -> str:
         """
-        Preprocess query for better retrieval (simplified for speed).
-        
-        Args:
-            question: Original question
-            
-        Returns:
-            Processed question (minimal processing for speed)
+        Preprocess query for better retrieval (minimal processing for speed).
         """
         # Simplified preprocessing - just return the question as-is for speed
         # Complex preprocessing can cause delays and isn't critical for retrieval
         return question.strip()
     
-    def get_answer_with_sources(self, question: str, use_metadata_filter: bool = False):
+    def get_answer_with_sources(self, question: str):
         """
         Query RAG system and return formatted answer with enriched sources.
-        Validates that relevant context was found to minimize hallucinations.
-        
-        Args:
-            question: The question to ask
-            use_metadata_filter: Whether to use metadata filtering (experimental)
-            
-        Returns:
-            Tuple of (formatted_answer, sources_list, full_result)
         """
         if self.qa_chain is None:
             raise ValueError("RAG chain not initialized. Call setup_rag_chain() first.")
@@ -340,13 +346,7 @@ Answer:"""
     
     def query(self, question: str):
         """
-        Query the RAG system with formatted output to console.
-        
-        Args:
-            question: The question to ask
-            
-        Returns:
-            Dictionary containing answer and source documents
+        Query the RAG system and print formatted results to console with sources.
         """
         if self.qa_chain is None:
             raise ValueError("RAG chain not initialized. Call setup_rag_chain() first.")
@@ -378,27 +378,11 @@ Answer:"""
         
         return result
     
-    def load_and_setup(self, embedding_model: str = "nomic-embed-text",
-                      llm_model: str = "llama3.2:3b", temperature: float = 0.7, 
-                      k: int = 4, score_threshold: float = None):
+    def load_and_setup(self, embedding_model: str = None,
+                      llm_model: str = None, temperature: float = None, 
+                      k: int = None, score_threshold: float = None):
         """
         Load existing vector store and setup RAG chain with optimized settings.
-        
-        This method assumes the vector store has been created externally using
-        the create_chroma_vectorstore.py script.
-        
-        Args:
-            embedding_model: Name of the Ollama embedding model
-            llm_model: Name of the Ollama LLM model
-            temperature: LLM temperature setting
-            k: Number of documents to retrieve (optimized default: 5)
-            score_threshold: Minimum similarity score threshold (optional)
-            
-        Returns:
-            Tuple of (qa_chain, memory, vectorstore)
-            
-        Raises:
-            FileNotFoundError: If vector store doesn't exist
         """
         logger.info(f"Loading vector store from: {self.chroma_dir}")
         
@@ -418,22 +402,12 @@ Answer:"""
         logger.info("RAG system fully initialized and ready!")
         return self.qa_chain, self.memory, self.vectorstore
     
-    def process_all(self, chunk_size: int = 1000, chunk_overlap: int = 200, 
-                    embedding_model: str = "nomic-embed-text",
-                    llm_model: str = "llama3.2:3b", temperature: float = 0.7, k: int = 3):
+    def process_all(self, chunk_size: int = None, chunk_overlap: int = None, 
+                    embedding_model: str = None,
+                    llm_model: str = None, temperature: float = None, k: int = None):
         """
         Run the complete pipeline: load PDFs, chunk, create vectorstore, setup RAG chain.
-        
-        NOTE: This method is deprecated. Use create_chroma_vectorstore.py script instead
-        to create the vector store externally, then use load_and_setup() method.
-        
-        Args:
-            chunk_size: Maximum size of each chunk
-            chunk_overlap: Overlap between chunks
-            embedding_model: Name of the Ollama embedding model
-            llm_model: Name of the Ollama LLM model
-            temperature: LLM temperature setting
-            k: Number of documents to retrieve
+        Deprecated: Use create_chroma_vectorstore.py instead.
         """
         print(f"📁 PDF Directory: {self.pdf_dir}")
         print(f"💾 ChromaDB Directory: {self.chroma_dir}\n")

@@ -12,18 +12,23 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 def transcribe_audio(audio_path, whisper_model):
     """
     Convert audio to text using Whisper.
-    
+
     Args:
         audio_path: Path to audio file
         whisper_model: Loaded Whisper model instance
-        
+    
     Returns:
         Transcribed text string, or empty string if transcription fails
+
+    Throws:
+        ValueError: If audio path is not provided
+        FileNotFoundError: If audio file is not found
+        RuntimeError: If transcription fails
     """
+
     if audio_path is None or audio_path == "":
         logger.warning("No audio path provided")
         return ""
@@ -48,7 +53,6 @@ def transcribe_audio(audio_path, whisper_model):
         logger.error(f"Transcription error: {e}", exc_info=True)
         return ""
 
-
 def text_to_speech(text):
     """
     Convert text to speech and save to WAV file.
@@ -56,9 +60,13 @@ def text_to_speech(text):
     
     Args:
         text: Text string to convert to speech
-        
+    
     Returns:
         Path to generated WAV file, or None if conversion fails
+
+    Throws:
+        subprocess.CalledProcessError: If the 'say' or 'ffmpeg' command fails
+        Exception: If the conversion fails
     """
     try:
         logger.debug(f"Generating speech for {len(text)} characters")

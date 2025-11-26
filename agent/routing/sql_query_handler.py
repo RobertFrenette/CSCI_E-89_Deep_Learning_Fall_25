@@ -1,12 +1,15 @@
 """
 SQL Query Handler Module
 
+Instantiates a SQLProcessor instance and uses it to handle queries.
+Used in the QueryService to handle SQL queries.
+
 Handles natural language queries to the SQL database and formats responses.
 Supports four main query types:
-1. Count insureds
-2. Count claims
-3. High-risk policies
-4. Insured information by ID
+- Count insureds
+- Count claims
+- High-risk policies
+- Insured information by ID
 """
 
 import re
@@ -22,9 +25,26 @@ from agent.routing.constants import (
 
 logger = logging.getLogger(__name__)
 
-
 class SQLQueryHandler:
-    """Handles SQL database queries and response formatting."""
+    """
+    Handles SQL database queries and response formatting.
+
+    Attributes:
+        sql_processor: SQLProcessor instance for database queries
+
+    Methods:
+        handle_query: Handle a natural language question and return formatted response
+        _is_count_insureds_query: Check if query is asking to count insureds
+        _handle_count_insureds: Handle count insureds query
+        _is_count_claims_query: Check if query is asking to count claims
+        _handle_count_claims: Handle count claims query
+        _is_high_risk_policies_query: Check if query is asking for high-risk policies
+        _handle_high-risk policies query
+        _is_insured_info_query: Check if query is asking for insured information
+        _handle_insured_info: Handle insured information query
+        _extract_insured_id: Extract insured ID from question
+        _format_insured_info: Format insured information response
+    """
     
     def __init__(self, sql_processor):
         """
@@ -67,14 +87,29 @@ class SQLQueryHandler:
         return DEFAULT_SQL_HELP_MSG
     
     def _is_count_insureds_query(self, question_lower: str) -> bool:
-        """Check if query is asking to count insureds."""
+        """
+        Check if query is asking to count insureds.
+        
+        Args:
+            question_lower: Lowercase version of the question
+            
+        Returns:
+            bool: True if query is asking to count insureds
+        """
         return ('insured' in question_lower and 
                 any(keyword in question_lower for keyword in ['how many', 'count', 'total']) and
                 'information' not in question_lower and 
                 'info' not in question_lower)
     
     def _handle_count_insureds(self) -> str:
-        """Handle count insureds query."""
+        """
+        Handle count insureds query.
+        
+        Executes SQL query to count total insureds in database.
+        
+        Returns:
+            str: Formatted response with insured count, or error message
+        """
         try:
             count = self.sql_processor.count_insureds()
             return f"There are {count} insureds in the database."
@@ -83,12 +118,27 @@ class SQLQueryHandler:
             return f"Error retrieving insured count: {str(e)}"
     
     def _is_count_claims_query(self, question_lower: str) -> bool:
-        """Check if query is asking to count claims."""
+        """
+        Check if query is asking to count claims.
+        
+        Args:
+            question_lower: Lowercase version of the question
+            
+        Returns:
+            bool: True if query is asking to count claims
+        """
         return ('claim' in question_lower and 
                 any(keyword in question_lower for keyword in ['how many', 'count', 'total', 'filed']))
     
     def _handle_count_claims(self) -> str:
-        """Handle count claims query."""
+        """
+        Handle count claims query.
+        
+        Executes SQL query to count total claims in database.
+        
+        Returns:
+            str: Formatted response with claims count, or error message
+        """
         try:
             count = self.sql_processor.count_claims()
             return f"{count} claims have been filed."
@@ -97,11 +147,26 @@ class SQLQueryHandler:
             return f"Error retrieving claims count: {str(e)}"
     
     def _is_high_risk_policies_query(self, question_lower: str) -> bool:
-        """Check if query is asking for high-risk policies."""
+        """
+        Check if query is asking for high-risk policies.
+        
+        Args:
+            question_lower: Lowercase version of the question
+            
+        Returns:
+            bool: True if query is asking for high-risk policies
+        """
         return 'high risk' in question_lower and 'polic' in question_lower
     
     def _handle_high_risk_policies(self) -> str:
-        """Handle high-risk policies query."""
+        """
+        Handle high-risk policies query.
+        
+        Executes SQL query to retrieve high-risk policies and formats response.
+        
+        Returns:
+            str: Formatted response with high-risk policy details, or error message
+        """
         try:
             policies = self.sql_processor.get_high_risk_policies(HIGH_RISK_SCORE_THRESHOLD)
             if not policies:
@@ -125,12 +190,31 @@ class SQLQueryHandler:
             return f"Error retrieving high-risk policies: {str(e)}"
     
     def _is_insured_info_query(self, question_lower: str, question: str) -> bool:
-        """Check if query is asking for insured information."""
+        """
+        Check if query is asking for insured information.
+        
+        Args:
+            question_lower: Lowercase version of the question
+            question: Original question (for pattern matching)
+            
+        Returns:
+            bool: True if query is asking for insured information
+        """
         matches = re.findall(INSURED_ID_PATTERN, question.upper())
         return bool(matches) or ('information' in question_lower and 'insured' in question_lower)
     
     def _handle_insured_info(self, question: str) -> str:
-        """Handle insured information query."""
+        """
+        Handle insured information query.
+        
+        Extracts insured ID from question and retrieves comprehensive information.
+        
+        Args:
+            question: User's question containing insured ID
+            
+        Returns:
+            str: Formatted response with insured details, or error message
+        """
         # Extract insured ID
         insured_id = self._extract_insured_id(question)
         
@@ -148,7 +232,17 @@ class SQLQueryHandler:
             return f"Error retrieving information for insured {insured_id}: {str(e)}"
     
     def _extract_insured_id(self, question: str) -> Optional[str]:
-        """Extract insured ID from question."""
+        """
+        Extract insured ID from question.
+        
+        Uses pattern matching and keyword search to find insured ID in question.
+        
+        Args:
+            question: User's question containing insured ID
+            
+        Returns:
+            Optional[str]: Extracted insured ID, or None if not found
+        """
         # Try pattern matching first
         matches = re.findall(INSURED_ID_PATTERN, question.upper())
         if matches:
@@ -164,7 +258,18 @@ class SQLQueryHandler:
         return None
     
     def _format_insured_info(self, insured_id: str, info: dict) -> str:
-        """Format insured information response."""
+        """
+        Format insured information response.
+        
+        Formats comprehensive insured information including basic info, policies, and claims.
+        
+        Args:
+            insured_id: The insured's unique identifier
+            info: Dictionary containing insured, policies, and claims data
+            
+        Returns:
+            str: Formatted multi-section response with all insured information
+        """
         response = f"Information for Insured {insured_id}:\n\n"
         
         # Insured basic information

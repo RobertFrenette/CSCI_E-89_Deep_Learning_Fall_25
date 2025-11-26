@@ -5,7 +5,7 @@
 #
 # Usage:
 #   ./init.sh           - Run script (venv will be activated during execution only)
-#   source init.sh      - Source script (venv will remain activated after completion)
+#   * source init.sh    - Source script (venv will remain activated after completion) - * recommended
 
 # Detect if script is being sourced or executed
 IS_SOURCED=false
@@ -95,7 +95,6 @@ echo "Cleanup complete! Setting up environment..."
 echo "=========================================="
 echo ""
 
-
 echo "Step 6: Creating virtual environment..."
 if command -v uv &> /dev/null; then
     uv venv --python python3.12
@@ -159,4 +158,3 @@ else
     echo "     python agent/app.py"
     echo ""
 fi
-

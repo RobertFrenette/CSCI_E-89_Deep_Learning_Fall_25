@@ -11,21 +11,21 @@ import sqlite3
 import csv
 from pathlib import Path
 
-
 def create_database(db_path):
     """
     Create the database schema with all necessary tables.
-    
-    This function establishes a connection to a SQLite database and creates
-    a normalized schema for storing insured customer data, policies, coverage
-    details, AI risk profiles, and claims history. Foreign key constraints are
-    enabled to maintain referential integrity.
-    
-    Args:
+
+    Description:
+        Establishes a connection to a SQLite database and creates a normalized schema for storing insured customer data, policies, coverage details, AI risk profiles, and claims history. Enables foreign key constraints for referential integrity.
+
+    Params:
         db_path (Path or str): The file path where the SQLite database will be created.
-    
+
     Returns:
         sqlite3.Connection: An active database connection object with the schema created.
+
+    Raises:
+        sqlite3.Error: If there is an error creating the database or tables.
     """
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -138,22 +138,24 @@ def create_database(db_path):
     conn.commit()
     return conn
 
-
 def import_csv(conn, table_name, csv_path):
     """
-    Import data from CSV file into specified table.
-    
-    Reads a CSV file and inserts all rows into the specified database table.
-    The CSV header row is used to map columns to table fields. All data is
-    committed to the database after successful insertion.
-    
-    Args:
+    Import data from a CSV file into the specified table.
+
+    Description:
+        Reads data from a CSV file and inserts it into the given table in the database.
+
+    Params:
         conn (sqlite3.Connection): Active database connection object.
-        table_name (str): Name of the database table to insert data into.
-        csv_path (Path or str): Path to the CSV file to import.
-    
+        table_name (str): Name of the table to import data into.
+        csv_path (Path): Path to the CSV file.
+
     Returns:
         int: The number of rows successfully imported from the CSV file.
+
+    Raises:
+        FileNotFoundError: If the CSV file does not exist.
+        sqlite3.Error: If there is an error inserting data into the table.
     """
     cursor = conn.cursor()
     
@@ -180,63 +182,95 @@ def import_csv(conn, table_name, csv_path):
         conn.commit()
         return len(rows)
 
+def setup_paths(db_path, csv_dir):
+    """
+    Ensures required directories exist and prints their locations.
 
-def main():
-    """
-    Main function to create and populate the database.
-    
-    This function orchestrates the entire database creation process:
-    1. Sets up file paths for the database and CSV source files
-    2. Removes any existing database file for a clean start
-    3. Creates the database schema with all tables and indexes
-    4. Imports data from CSV files in the correct order (respecting foreign keys)
-    5. Verifies the imported data with count queries
-    6. Displays sample query results
-    
-    The function provides detailed console output to track progress and
-    confirm successful completion.
-    
-    Args:
-        None
-    
+    Description:
+        Checks and creates the database directory if needed, and verifies the existence of the CSV directory.
+
+    Params:
+        db_path (Path): Path to the database file.
+        csv_dir (Path): Path to the directory containing CSV files.
+
     Returns:
-        None
+        bool: True if setup is successful, False otherwise.
+
+    Raises:
+        OSError: If directory creation fails.
     """
-    print("=" * 70)
-    print("Creating AI Agent Insure - Insureds Database")
-    print("=" * 70)
-    print()
-    
-    # Define paths
-    script_dir = Path(__file__).parent
-    db_path = script_dir / "insureds.db"
-    csv_dir = script_dir / "insured_data"
-    
-    # Ensure directories exist
     db_path.parent.mkdir(exist_ok=True)
     if not csv_dir.exists():
         print(f"❌ CSV directory not found: {csv_dir}")
         print("Please ensure the insured_data folder exists with CSV files.")
-        return
-    
+        return False
     print(f"📁 Database location: {db_path}")
     print(f"📁 CSV source directory: {csv_dir}")
     print()
-    
-    # Delete existing database if it exists
+    return True
+
+def remove_existing_db(db_path):
+    """
+    Removes the existing database file if it exists.
+
+    Description:
+        Deletes the database file at the specified path if it exists.
+
+    Params:
+        db_path (Path): Path to the database file.
+
+    Returns:
+        None
+
+    Raises:
+        OSError: If file removal fails.
+    """
     if db_path.exists():
         print(f"🗑️  Removing existing database: {db_path}")
         db_path.unlink()
         print("✅ Existing database removed")
         print()
-    
-    # Create database schema
+
+def create_schema(db_path):
+    """
+    Creates the database schema and returns the connection object.
+
+    Description:
+        Calls create_database to initialize the schema and returns the connection.
+
+    Params:
+        db_path (Path): Path to the database file.
+
+    Returns:
+        sqlite3.Connection: An active database connection object with the schema created.
+
+    Raises:
+        sqlite3.Error: If there is an error creating the database or tables.
+    """
     print("🔨 Creating database schema...")
     conn = create_database(db_path)
     print("✅ Schema created successfully")
     print()
-    
-    # Import data in correct order (respecting foreign keys)
+    return conn
+
+def import_all_csvs(conn, csv_dir):
+    """
+    Imports all CSV files into the database in the correct order.
+
+    Description:
+        Iterates through all required CSV files and imports their data into the corresponding tables, respecting foreign key order.
+
+    Params:
+        conn (sqlite3.Connection): Active database connection object.
+        csv_dir (Path): Path to the directory containing CSV files.
+
+    Returns:
+        int: Total number of rows imported from all CSV files.
+
+    Raises:
+        FileNotFoundError: If any required CSV file does not exist.
+        sqlite3.Error: If there is an error inserting data into the tables.
+    """
     tables_to_import = [
         ("insureds", "insureds.csv"),
         ("policies", "policies.csv"),
@@ -244,31 +278,41 @@ def main():
         ("ai_risk_profile", "ai_risk_profile.csv"),
         ("claims_history", "claims_history.csv")
     ]
-    
     print("📥 Importing data from CSV files...")
     print()
-    
     total_rows = 0
     for table_name, csv_file in tables_to_import:
         csv_path = csv_dir / csv_file
-        
         if not csv_path.exists():
             print(f"❌ File not found: {csv_path}")
             continue
-        
         print(f"   Importing {csv_file}...", end=" ")
         row_count = import_csv(conn, table_name, csv_path)
         total_rows += row_count
         print(f"✅ {row_count:,} rows")
-    
     print()
     print(f"✅ Total rows imported: {total_rows:,}")
     print()
-    
-    # Verify data
+    return total_rows
+
+def verify_data(conn):
+    """
+    Runs verification queries to check record counts for each table.
+
+    Description:
+        Executes SELECT COUNT(*) queries for each table and prints the record counts.
+
+    Params:
+        conn (sqlite3.Connection): Active database connection object.
+
+    Returns:
+        None
+
+    Raises:
+        sqlite3.Error: If there is an error executing the queries.
+    """
     print("🔍 Verifying data...")
     cursor = conn.cursor()
-    
     verification_queries = [
         ("Insureds", "SELECT COUNT(*) FROM insureds"),
         ("Policies", "SELECT COUNT(*) FROM policies"),
@@ -276,16 +320,30 @@ def main():
         ("AI Risk Profiles", "SELECT COUNT(*) FROM ai_risk_profile"),
         ("Claims", "SELECT COUNT(*) FROM claims_history")
     ]
-    
     for label, query in verification_queries:
         cursor.execute(query)
         count = cursor.fetchone()[0]
         print(f"   {label}: {count:,} records")
-    
     print()
-    
-    # Show sample queries
+
+def show_sample_query(conn):
+    """
+    Executes and displays a sample query for top 5 insureds by policy count.
+
+    Description:
+        Runs a sample SQL query to display the top 5 insureds by policy count and prints the results.
+
+    Params:
+        conn (sqlite3.Connection): Active database connection object.
+
+    Returns:
+        None
+
+    Raises:
+        sqlite3.Error: If there is an error executing the query.
+    """
     print("📊 Sample query - Top 5 insureds by policy count:")
+    cursor = conn.cursor()
     cursor.execute("""
         SELECT i.First_Name, i.Last_Name, i.Company_Name, COUNT(p.Policy_Number) as policy_count
         FROM insureds i
@@ -294,15 +352,45 @@ def main():
         ORDER BY policy_count DESC
         LIMIT 5
     """)
-    
     for row in cursor.fetchall():
         print(f"   {row[0]} {row[1]} ({row[2]}): {row[3]} policies")
-    
     print()
-    
-    # Close connection
+
+def main():
+    """
+    Orchestrates the insureds database creation and population process.
+
+    Description:
+        Delegates setup, import, verification, and sample query tasks to helper functions.
+
+    Params:
+        None
+
+    Returns:
+        None
+
+    Raises:
+        Any exceptions raised by helper functions are propagated.
+    """
+    print("=" * 70)
+    print("Creating AI Agent Insure - Insureds Database")
+    print("=" * 70)
+    print()
+
+    script_dir = Path(__file__).parent
+    db_path = script_dir / "insureds.db"
+    csv_dir = script_dir / "insured_data"
+
+    if not setup_paths(db_path, csv_dir):
+        return
+
+    remove_existing_db(db_path)
+    conn = create_schema(db_path)
+    total_rows = import_all_csvs(conn, csv_dir)
+    verify_data(conn)
+    show_sample_query(conn)
     conn.close()
-    
+
     print("=" * 70)
     print("✅ Database created and populated successfully!")
     print("=" * 70)

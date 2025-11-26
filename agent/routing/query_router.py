@@ -1,5 +1,6 @@
 """
 Query Router Module
+Used in the QueryService to route queries to SQL or RAG.
 
 Intelligently detects whether a query should be routed to SQL database
 or RAG system using multi-factor analysis.
@@ -18,7 +19,6 @@ from agent.routing.constants import (
 )
 
 logger = logging.getLogger(__name__)
-
 
 def detect_query_type(question: str) -> tuple[str, str]:
     """
@@ -102,4 +102,3 @@ def detect_query_type(question: str) -> tuple[str, str]:
         # Default to RAG (documents) for ambiguous or company info queries
         logger.info(f"RAG routing: score {sql_score} vs {rag_score}")
         return 'rag', question_stripped
-
