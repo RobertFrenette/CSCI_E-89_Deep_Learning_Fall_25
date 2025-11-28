@@ -230,8 +230,7 @@ class RAGChatbotApp:
             debug=config.DEBUG,
             server_name=config.SERVER_NAME,
             server_port=config.SERVER_PORT,
-            favicon_path=favicon_path,
-            theme=gr.themes.Soft()
+            favicon_path=favicon_path
         )
 
 def main():

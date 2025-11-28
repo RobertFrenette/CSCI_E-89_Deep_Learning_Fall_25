@@ -19,7 +19,7 @@ def create_interface(app):
     """
     logo_path = os.path.join(os.path.dirname(__file__), "assets", "shield.png")
     
-    with gr.Blocks(title="AI Agent Insure - Agent Assist") as demo:
+    with gr.Blocks(title="AI Agent Insure - Agent Assist", theme=gr.themes.Soft()) as demo:
         # Header with logo and title side by side
         with gr.Row():
             with gr.Column(scale=1, min_width=100):
