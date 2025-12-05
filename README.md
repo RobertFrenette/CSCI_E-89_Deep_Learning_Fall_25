@@ -18,7 +18,6 @@ Repo for the CSCI E-89 Deep Learning Final Project (Fall '25, Harvard Extension 
 - [Summary](https://youtu.be/HinayJJ687k)
 - [Demo](https://youtu.be/V0mAQjiUK6Q)
 - [Local Setup and Execution](https://youtu.be/Z-3NUKS5HLE)
-- Code Walkthrough: TBD
 
 ## 🛠️ Technologies Used
 
