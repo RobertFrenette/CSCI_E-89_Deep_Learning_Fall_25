@@ -97,7 +97,7 @@ The AI Agent Insure Application Platform is a production-ready insurance managem
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   git checkout deployment
+   git checkout feature/refactor-ai-agent-insure-platform
    cd AI_Agent_Insure
    ```
    

@@ -10,15 +10,15 @@ Create a `.env` file in the project root with the following variables:
 
 ```bash
 # PostgreSQL Configuration
+POSTGRES_USER=YOUR_POSTGRES_USER
+POSTGRES_PASSWORD=YOUR_POSTGRES_USER_PASSWORD
+POSTGRES_DB=insurance_db
 POSTGRES_HOST=postgres
 POSTGRES_PORT=5432
-POSTGRES_DB=insurance_db
-POSTGRES_USER=insure_admin
-POSTGRES_PASSWORD=insure_secure_pass_2025
 
 # MongoDB Configuration
-MONGO_ROOT_USER=mongo_admin
-MONGO_ROOT_PASSWORD=mongo_secure_pass_2025
+MONGO_ROOT_USER=YOUR_YOUR_MONGO_ROOT_USER
+MONGO_ROOT_PASSWORD=YOUR_MONGO_ROOT_PASSWORD
 MONGO_INITDB_DATABASE=insurance_users
 
 # ChromaDB Configuration
@@ -60,14 +60,14 @@ A complete `.env` template:
 # ============================================
 
 # Database Configuration
+POSTGRES_USER=YOUR_POSTGRES_USER
+POSTGRES_PASSWORD=YOUR_POSTGRES_USER_PASSWORD
+POSTGRES_DB=insurance_db
 POSTGRES_HOST=postgres
 POSTGRES_PORT=5432
-POSTGRES_DB=insurance_db
-POSTGRES_USER=insure_admin
-POSTGRES_PASSWORD=insure_secure_pass_2025
 
-MONGO_ROOT_USER=mongo_admin
-MONGO_ROOT_PASSWORD=mongo_secure_pass_2025
+MONGO_ROOT_USER=YOUR_YOUR_MONGO_ROOT_USER
+MONGO_ROOT_PASSWORD=YOUR_MONGO_ROOT_PASSWORD
 MONGO_INITDB_DATABASE=insurance_users
 
 # Vector Store

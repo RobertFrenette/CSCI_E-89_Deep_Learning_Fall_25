@@ -15,6 +15,7 @@ Complete guide for deploying the AI Agent Insurance Platform.
 
 ```bash
 git clone <repository-url>
+git checkout feature/refactor-ai-agent-insure-platform
 cd AI_Agent_Insure
 ```
 
@@ -107,39 +108,6 @@ The `deploy.sh` script automates the entire deployment:
    - Display service URLs
    - Show deployment summary
 
-### Manual Deployment
-
-If you prefer manual deployment:
-
-```bash
-# 1. Create network
-docker network create insure-network
-
-# 2. Start databases
-docker-compose up -d postgres mongodb chromadb
-
-# 3. Wait for databases to be ready
-docker-compose ps
-
-# 4. Start Ollama
-docker-compose up -d ollama
-
-# 5. Pull models
-docker exec insure-ollama ollama pull phi3:mini
-docker exec insure-ollama ollama pull nomic-embed-text
-
-# 6. Start backends
-docker-compose up -d admin-backend client-backend
-
-# 7. Start AI Agent
-docker-compose up -d ai-agent
-
-# 8. Start frontends
-docker-compose up -d admin-frontend client-frontend
-
-# 9. Start dashboard
-docker-compose up -d insure-dashboard
-```
 
 ## Service URLs
 
@@ -464,42 +432,6 @@ git checkout <previous-commit>
 # Rebuild and deploy
 ./deploy.sh
 ```
-
-## Maintenance
-
-### Regular Maintenance Tasks
-
-1. **Update Dependencies**
-   ```bash
-   # Update npm packages
-   cd admin-app/backend && npm update
-   cd admin-app/frontend && npm update
-   
-   # Update Python packages
-   cd client-app/backend && pip install --upgrade -r requirements.txt
-   cd ai-agent && pip install --upgrade -r requirements.txt
-   ```
-
-2. **Database Maintenance**
-   ```bash
-   # PostgreSQL vacuum
-   docker exec insure-postgres psql -U insure_admin -d insurance_db -c "VACUUM ANALYZE;"
-   
-   # MongoDB compact
-   docker exec insure-mongodb mongosh -u mongo_admin -p mongo_secure_pass_2025 --eval "db.runCommand({compact: 'user_profiles'})"
-   ```
-
-3. **Clean Up**
-   ```bash
-   # Remove unused images
-   docker image prune -a
-   
-   # Remove unused volumes
-   docker volume prune
-   
-   # Remove unused networks
-   docker network prune
-   ```
 
 ## Next Steps
 
