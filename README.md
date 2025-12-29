@@ -2,6 +2,36 @@
 
 Repo for the CSCI E-89 Deep Learning Final Project (Fall '25, Harvard Extension School)
 
+---
+
+## Updates
+
+**2025-12-29:** The `feature/refactor-ai-agent-insure-platform` branch contains an updated version of the AI Agent Insure Application Platform.
+
+## <img src="./img/shield.png" alt="Shield Icon" width="28" style="vertical-align:middle; margin-right:8px;"> AI Agent Insure Application Platform
+
+The AI Agent Insure Application Platform is a production-ready insurance management system that combines:
+
+- **Structured Data (PostgreSQL):** Policies, claims, customers, risk profiles
+- **Document Knowledge Base (ChromaDB):** Company information, products, procedures
+- **User Data (MongoDB):** User profiles and query history
+- **AI Agent:** Intelligent query routing and RAG-powered question answering
+
+### Key Features
+
+🤖 **Intelligent Query Routing** - Automatically routes queries to SQL, RAG, or Hybrid processing  
+💬 **Multimodal Chat Interface** - Text and speech input/output for both admin and client users  
+📊 **Admin Dashboard** - Professional Next.js dashboard for support personnel  
+👤 **Client Portal** - Modern customer-facing portal with policy management  
+📄 **PDF Document Upload** - Upload and ingest PDFs into the knowledge base  
+🔄 **CSV Data Refresh** - Refresh database from CSV files via API  
+⚡ **Performance Optimized** - Query caching, connection pooling, and optimized database queries  
+🔒 **Role-Based Access Control** - Admin, authenticated client, and guest user permissions
+
+See the `feature/refactor-ai-agent-insure-platform` branch for detailed documentation and setup instructions.
+
+---
+
 ## 📚 Course Information
 
 - **Course**: [CSCI E-89 Deep Learning](https://coursebrowser.dce.harvard.edu/course/deep-learning/)
