@@ -1,0 +1,720 @@
+{% extends "base.html" %}
+
+{% block title %}AI Chat - AI Agent Insurance{% endblock %}
+
+{% block extra_head %}
+<style>
+    .chat-container {
+        height: calc(100vh - 200px);
+        max-height: 800px;
+    }
+    
+    .message-user {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 18px 18px 4px 18px;
+    }
+    
+    .message-assistant {
+        background: #f3f4f6;
+        color: #1f2937;
+        border-radius: 18px 18px 18px 4px;
+    }
+    
+    .typing-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .typing-indicator span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #9ca3af;
+        animation: typing 1.4s infinite;
+    }
+    
+    .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+        0%, 60%, 100% {
+            transform: translateY(0);
+            opacity: 0.7;
+        }
+        30% {
+            transform: translateY(-10px);
+            opacity: 1;
+        }
+    }
+    
+    .markdown-content {
+        line-height: 1.6;
+    }
+    
+    .markdown-content p {
+        margin-bottom: 0.5rem;
+    }
+    
+    .markdown-content ul, .markdown-content ol {
+        margin-left: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .markdown-content code {
+        background-color: rgba(0, 0, 0, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+    
+    .markdown-content pre {
+        background-color: rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 0.5rem 0;
+    }
+    
+    .mic-button {
+        transition: all 0.3s ease;
+    }
+    
+    .mic-button.recording {
+        background-color: #ef4444 !important;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
+        }
+    }
+    
+    .speaker-button {
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+    
+    .speaker-button:hover {
+        opacity: 1;
+    }
+    
+    .speaker-button.playing {
+        opacity: 1;
+        color: #667eea;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navigation -->
+<nav class="bg-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <img src="{{ url_for('static', filename='shield.png') }}" alt="Logo" class="h-8 w-8 mr-3">
+                <span class="text-xl font-bold text-gray-800">AI Agent Insurance</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                {% if user %}
+                    <a href="{{ url_for('dashboard') }}" class="text-gray-700 hover:text-purple-600">Dashboard</a>
+                    <a href="{{ url_for('profile') }}" class="text-gray-700 hover:text-purple-600">Profile</a>
+                    <a href="{{ url_for('logout') }}" class="text-gray-700 hover:text-purple-600">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('index') }}" class="text-gray-700 hover:text-purple-600">Home</a>
+                    <a href="{{ url_for('index', show='login') }}" class="text-gray-700 hover:text-purple-600">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">AI Assistant</h1>
+        <p class="text-gray-600 mt-2">
+            {% if user %}
+                Ask me anything about your policies, claims, or general insurance questions.
+            {% else %}
+                Ask me anything about insurance. <a href="{{ url_for('index', show='login') }}" class="text-purple-600 hover:text-purple-800 underline">Login</a> to access personalized information about your policies.
+            {% endif %}
+        </p>
+    </div>
+    
+    <!-- Chat Container -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Messages Area -->
+        <div id="messages-container" class="chat-container overflow-y-auto p-6 space-y-4 bg-gray-50">
+            <div class="text-center text-gray-500 py-8">
+                <svg class="w-12 h-12 mx-auto mb-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+                <p class="text-lg font-medium">Start a conversation</p>
+                <p class="text-sm mt-2">Ask me anything about insurance, your policies, or claims.</p>
+            </div>
+        </div>
+        
+        <!-- Input Area -->
+        <div class="border-t border-gray-200 p-4 bg-white">
+            <form id="chat-form" class="flex gap-3">
+                <div class="flex-1 flex gap-2">
+                    <input
+                        type="text"
+                        id="message-input"
+                        placeholder="Type your message or click mic to speak..."
+                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        autocomplete="off"
+                    />
+                    <button
+                        type="button"
+                        id="mic-button"
+                        class="mic-button px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        title="Click to speak (Speech-to-Text)"
+                    >
+                        <svg id="mic-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                        </svg>
+                        <svg id="mic-stop-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <button
+                    type="submit"
+                    id="send-button"
+                    class="px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                    <span id="send-button-text">Send</span>
+                    <span id="send-button-loading" class="hidden">
+                        <svg class="animate-spin h-5 w-5 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </span>
+                </button>
+            </form>
+            <div id="speech-status" class="mt-2 text-sm text-gray-500 hidden"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const AI_AGENT_URL = '{{ ai_agent_url }}';
+const USER_ID = '{{ user_id }}';
+const messages = [];
+let abortController = null;
+
+const messagesContainer = document.getElementById('messages-container');
+const chatForm = document.getElementById('chat-form');
+const messageInput = document.getElementById('message-input');
+const sendButton = document.getElementById('send-button');
+const sendButtonText = document.getElementById('send-button-text');
+const sendButtonLoading = document.getElementById('send-button-loading');
+const micButton = document.getElementById('mic-button');
+const micIcon = document.getElementById('mic-icon');
+const micStopIcon = document.getElementById('mic-stop-icon');
+const speechStatus = document.getElementById('speech-status');
+
+// Speech Recognition setup
+let recognition = null;
+let isRecording = false;
+let currentUtterance = null;
+
+// Initialize Speech Recognition (with browser compatibility)
+function initSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+        micButton.disabled = true;
+        micButton.title = 'Speech recognition not supported in this browser';
+        return;
+    }
+    
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    
+    recognition.onstart = () => {
+        isRecording = true;
+        micButton.classList.add('recording');
+        micIcon.classList.add('hidden');
+        micStopIcon.classList.remove('hidden');
+        speechStatus.textContent = 'Listening...';
+        speechStatus.classList.remove('hidden');
+    };
+    
+    recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript + ' ';
+            } else {
+                interimTranscript += transcript;
+            }
+        }
+        
+        messageInput.value = finalTranscript + interimTranscript;
+        
+        if (finalTranscript) {
+            speechStatus.textContent = 'Processing...';
+        } else if (interimTranscript) {
+            speechStatus.textContent = 'Listening: ' + interimTranscript;
+        }
+    };
+    
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        isRecording = false;
+        micButton.classList.remove('recording');
+        micIcon.classList.remove('hidden');
+        micStopIcon.classList.add('hidden');
+        
+        let errorMsg = 'Speech recognition error';
+        if (event.error === 'no-speech') {
+            errorMsg = 'No speech detected. Try again.';
+        } else if (event.error === 'audio-capture') {
+            errorMsg = 'Microphone not found.';
+        } else if (event.error === 'not-allowed') {
+            errorMsg = 'Microphone permission denied.';
+        }
+        
+        speechStatus.textContent = errorMsg;
+        setTimeout(() => {
+            speechStatus.classList.add('hidden');
+        }, 3000);
+    };
+    
+    recognition.onend = () => {
+        isRecording = false;
+        micButton.classList.remove('recording');
+        micIcon.classList.remove('hidden');
+        micStopIcon.classList.add('hidden');
+        
+        if (messageInput.value.trim()) {
+            speechStatus.textContent = 'Ready to send';
+            setTimeout(() => {
+                speechStatus.classList.add('hidden');
+            }, 2000);
+        } else {
+            speechStatus.classList.add('hidden');
+        }
+    };
+}
+
+// Text-to-Speech function
+function speakText(text) {
+    // Stop any currently playing speech
+    if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+    }
+    
+    // Remove markdown formatting for cleaner speech
+    const cleanText = text
+        .replace(/\*\*(.+?)\*\*/g, '$1')
+        .replace(/\*(.+?)\*/g, '$1')
+        .replace(/`(.+?)`/g, '$1')
+        .replace(/#{1,6}\s+/g, '')
+        .replace(/\n+/g, '. ')
+        .trim();
+    
+    if (!cleanText) return;
+    
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'en-US';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    
+    // Find the speaker button and mark it as playing
+    const speakerButtons = document.querySelectorAll('.speaker-button');
+    let currentButton = null;
+    
+    utterance.onstart = () => {
+        speakerButtons.forEach(btn => {
+            if (btn.onclick && btn.onclick.toString().includes(cleanText.substring(0, 20))) {
+                currentButton = btn;
+                btn.classList.add('playing');
+            }
+        });
+    };
+    
+    utterance.onend = () => {
+        if (currentButton) {
+            currentButton.classList.remove('playing');
+        }
+    };
+    
+    utterance.onerror = (event) => {
+        console.error('Speech synthesis error:', event);
+        if (currentButton) {
+            currentButton.classList.remove('playing');
+        }
+    };
+    
+    currentUtterance = utterance;
+    window.speechSynthesis.speak(utterance);
+}
+
+// Microphone button handler
+micButton.addEventListener('click', () => {
+    if (!recognition) {
+        alert('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
+        return;
+    }
+    
+    if (isRecording) {
+        recognition.stop();
+    } else {
+        try {
+            recognition.start();
+        } catch (error) {
+            console.error('Error starting recognition:', error);
+            speechStatus.textContent = 'Error starting speech recognition';
+            speechStatus.classList.remove('hidden');
+        }
+    }
+});
+
+// Initialize on page load
+initSpeechRecognition();
+
+// Simple markdown renderer (basic support)
+function renderMarkdown(text) {
+    // Escape HTML first
+    let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    
+    // Convert markdown to HTML
+    html = html
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/`(.+?)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
+    
+    return html;
+}
+
+function addMessage(role, content, sources = [], queryType = null) {
+    // Remove empty welcome message if exists
+    const welcomeMsg = messagesContainer.querySelector('.text-center');
+    if (welcomeMsg) {
+        welcomeMsg.remove();
+    }
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+    
+    const messageContent = document.createElement('div');
+    messageContent.className = `max-w-[80%] px-4 py-3 ${role === 'user' ? 'message-user' : 'message-assistant'}`;
+    
+    if (role === 'assistant') {
+        // Create speaker button with data attribute
+        const speakerButton = document.createElement('button');
+        speakerButton.type = 'button';
+        speakerButton.className = 'speaker-button flex-shrink-0 p-1 rounded hover:bg-gray-200 focus:outline-none';
+        speakerButton.title = 'Listen to response (Text-to-Speech)';
+        speakerButton.setAttribute('data-text', content);
+        speakerButton.innerHTML = `
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+            </svg>
+        `;
+        speakerButton.addEventListener('click', () => {
+            const textToSpeak = speakerButton.getAttribute('data-text');
+            speakText(textToSpeak);
+        });
+        
+        const contentWrapper = document.createElement('div');
+        contentWrapper.className = 'flex items-start justify-between gap-2';
+        
+        const markdownDiv = document.createElement('div');
+        markdownDiv.className = 'flex-1 markdown-content';
+        markdownDiv.innerHTML = renderMarkdown(content);
+        
+        contentWrapper.appendChild(markdownDiv);
+        contentWrapper.appendChild(speakerButton);
+        messageContent.appendChild(contentWrapper);
+        
+        if (sources.length > 0) {
+            const sourcesDiv = document.createElement('div');
+            sourcesDiv.className = `mt-3 pt-3 border-t ${role === 'user' ? 'border-white/20' : 'border-gray-300'}`;
+            sourcesDiv.innerHTML = `
+                <p class="text-xs font-semibold mb-1 ${role === 'user' ? 'text-white/90' : 'text-gray-600'}">Sources:</p>
+                <ul class="text-xs space-y-1 ${role === 'user' ? 'text-white/80' : 'text-gray-500'}">
+                    ${sources.map(src => `<li>• ${src.split('/').pop()}</li>`).join('')}
+                </ul>
+            `;
+            messageContent.appendChild(sourcesDiv);
+        }
+    } else {
+        messageContent.textContent = content;
+    }
+    
+    messageDiv.appendChild(messageContent);
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    return messageDiv;
+}
+
+function updateLastMessage(content) {
+    const lastMessage = messagesContainer.querySelector('.message-assistant:last-of-type');
+    if (lastMessage) {
+        const messageContent = lastMessage.querySelector('.message-assistant');
+        if (messageContent) {
+            const contentDiv = messageContent.querySelector('.markdown-content');
+            if (contentDiv) {
+                contentDiv.innerHTML = renderMarkdown(content);
+            }
+            
+            // Update speaker button data attribute
+            const speakerButton = messageContent.querySelector('.speaker-button');
+            if (speakerButton) {
+                speakerButton.setAttribute('data-text', content);
+            }
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    }
+}
+
+function setLoading(isLoading) {
+    sendButton.disabled = isLoading;
+    messageInput.disabled = isLoading;
+    
+    if (isLoading) {
+        sendButtonText.classList.add('hidden');
+        sendButtonLoading.classList.remove('hidden');
+        sendButton.classList.add('bg-red-500', 'from-red-500', 'to-red-600');
+        sendButton.classList.remove('from-purple-500', 'to-purple-600');
+        sendButtonText.textContent = 'Cancel';
+    } else {
+        sendButtonText.classList.remove('hidden');
+        sendButtonLoading.classList.add('hidden');
+        sendButton.classList.remove('bg-red-500', 'from-red-500', 'to-red-600');
+        sendButton.classList.add('from-purple-500', 'to-purple-600');
+        sendButtonText.textContent = 'Send';
+    }
+}
+
+async function sendMessage() {
+    const message = messageInput.value.trim();
+    if (!message || sendButton.disabled) {
+        return;
+    }
+    
+    // Add user message
+    addMessage('user', message);
+    messageInput.value = '';
+    
+    // Add empty assistant message
+    const assistantMessageDiv = addMessage('assistant', '');
+    let accumulatedContent = '';
+    let sources = [];
+    let queryType = null;
+    
+    // Build messages array for context
+    const chatMessages = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+    }));
+    chatMessages.push({ role: 'user', content: message });
+    
+    // Create abort controller for cancellation
+    abortController = new AbortController();
+    setLoading(true);
+    
+    // Build request payload
+    const requestPayload = {
+        messages: chatMessages,
+        user_id: USER_ID,
+        top_k: 3,
+        temperature: 0.7
+    };
+    
+    // Log request to console
+    console.log("📤 AI Agent Request:", {
+        request: requestPayload,
+        timestamp: new Date().toISOString(),
+    });
+    
+    try {
+        const response = await fetch(`${AI_AGENT_URL}/api/agent/chat/stream`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestPayload),
+            signal: abortController.signal
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        
+        while (true) {
+            if (abortController.signal.aborted) {
+                reader.cancel();
+                break;
+            }
+            
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+            
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    try {
+                        const data = JSON.parse(line.slice(6));
+                        
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        
+                        if (data.chunk) {
+                            accumulatedContent += data.chunk;
+                            updateLastMessage(accumulatedContent);
+                        }
+                        
+                        if (data.done) {
+                            sources = data.sources || [];
+                            queryType = data.query_type;
+                            break;
+                        }
+                    } catch (e) {
+                        // Skip invalid JSON
+                        continue;
+                    }
+                }
+            }
+        }
+        
+        // Update final message with sources
+        if (accumulatedContent) {
+            const lastMessage = messagesContainer.querySelector('.message-assistant:last-of-type');
+            if (lastMessage) {
+                const messageContent = lastMessage.querySelector('.message-assistant');
+                if (messageContent) {
+                    // Update the markdown content
+                    const contentDiv = messageContent.querySelector('.markdown-content');
+                    if (contentDiv) {
+                        contentDiv.innerHTML = renderMarkdown(accumulatedContent);
+                    }
+                    
+                    // Update the speaker button data attribute with the full content
+                    const speakerButton = messageContent.querySelector('.speaker-button');
+                    if (speakerButton) {
+                        speakerButton.setAttribute('data-text', accumulatedContent);
+                    }
+                    
+                    // Add sources if available
+                    if (sources.length > 0 && !messageContent.querySelector('.mt-3.pt-3')) {
+                        const sourcesDiv = document.createElement('div');
+                        sourcesDiv.className = 'mt-3 pt-3 border-t border-gray-300';
+                        sourcesDiv.innerHTML = `
+                            <p class="text-xs font-semibold mb-1 text-gray-600">Sources:</p>
+                            <ul class="text-xs space-y-1 text-gray-500">
+                                ${sources.map(src => `<li>• ${src.split('/').pop()}</li>`).join('')}
+                            </ul>
+                        `;
+                        messageContent.appendChild(sourcesDiv);
+                    }
+                }
+            }
+        }
+        
+        // Store message in history
+        messages.push({ role: 'user', content: message });
+        messages.push({ role: 'assistant', content: accumulatedContent });
+        
+        // Log complete response with text content
+        console.log("📥 AI Agent Response:", {
+            answer: accumulatedContent,
+            sources: sources,
+            query_type: queryType,
+            timestamp: new Date().toISOString(),
+        });
+        
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            // User cancelled
+            console.log("Streaming chat cancelled by user");
+            const lastMessage = messagesContainer.querySelector('.message-assistant:last-of-type');
+            if (lastMessage) {
+                const contentDiv = lastMessage.querySelector('.markdown-content');
+                if (contentDiv && !contentDiv.textContent.trim()) {
+                    lastMessage.remove();
+                } else {
+                    contentDiv.innerHTML += '<br><br><em class="text-gray-500">Query cancelled by user.</em>';
+                }
+            }
+        } else {
+            // Log error to console
+            console.error("Chat error:", error);
+            // Show error
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg';
+            errorDiv.textContent = `Error: ${error.message}`;
+            messagesContainer.appendChild(errorDiv);
+        }
+    } finally {
+        setLoading(false);
+        abortController = null;
+    }
+}
+
+chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (sendButton.disabled && abortController) {
+        // Cancel request
+        abortController.abort();
+        setLoading(false);
+    } else {
+        sendMessage();
+    }
+});
+
+messageInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        chatForm.dispatchEvent(new Event('submit'));
+    }
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+    }
+    if (recognition && isRecording) {
+        recognition.stop();
+    }
+});
+</script>
+{% endblock %}
+

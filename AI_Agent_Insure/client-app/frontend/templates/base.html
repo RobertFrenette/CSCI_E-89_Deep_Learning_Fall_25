@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Agent Insurance{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Flash message styling for clarity */
+        .flash-message {
+            font-weight: 700 !important;
+            font-size: 18px !important;
+            line-height: 1.6 !important;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            letter-spacing: 0.02em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            opacity: 1 !important;
+            min-width: 300px;
+            max-width: 500px;
+        }
+        
+        .flash-message-container {
+            z-index: 9999 !important;
+            position: fixed !important;
+            top: 80px !important;
+            right: 20px !important;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-message-container space-y-3">
+                {% for category, message in messages %}
+                    <div class="flash-message px-6 py-4 rounded-lg shadow-2xl {% if category == 'error' %}bg-red-600{% elif category == 'success' %}bg-green-600{% elif category == 'warning' %}bg-yellow-500{% else %}bg-blue-600{% endif %} text-white animate-slide-in border-2 {% if category == 'error' %}border-red-700{% elif category == 'success' %}border-green-700{% elif category == 'warning' %}border-yellow-600{% else %}border-blue-700{% endif %}">
+                        <strong>{{ message }}</strong>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    {% block content %}{% endblock %}
+    
+    <!-- Chat Widget (available on all pages) -->
+    {% include 'chat_widget.html' %}
+    
+    <script>
+        // Auto-hide flash messages after 5 seconds
+        setTimeout(() => {
+            const messages = document.querySelectorAll('.flash-message');
+            messages.forEach(msg => {
+                msg.style.transition = 'opacity 0.5s';
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 500);
+            });
+        }, 5000);
+    </script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
+

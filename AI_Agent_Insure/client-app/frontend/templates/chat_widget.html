@@ -1,0 +1,859 @@
+<!-- Floating Chat Widget -->
+<div id="chat-widget" class="fixed bottom-4 right-4 z-50">
+    <!-- Chat Button (shown when widget is closed) -->
+    <button
+        id="chat-widget-toggle"
+        class="w-14 h-14 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-full shadow-lg hover:from-purple-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all transform hover:scale-110 flex items-center justify-center"
+        title="Open AI Assistant"
+    >
+        <svg id="chat-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+        <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    </button>
+    
+    <!-- Chat Window (shown when widget is open) -->
+    <div id="chat-window" class="hidden w-[500px] max-w-[90vw] h-[600px] bg-white rounded-lg shadow-2xl flex flex-col border border-gray-200">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+                <h3 class="font-semibold">AI Assistant</h3>
+            </div>
+            <button
+                id="chat-window-minimize"
+                class="text-white/80 hover:text-white focus:outline-none"
+                title="Minimize"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Messages Area -->
+        <div id="chat-widget-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+            <div class="text-center text-gray-500 py-8">
+                <svg class="w-12 h-12 mx-auto mb-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+                <p class="text-sm font-medium">Start a conversation</p>
+                <p class="text-xs mt-2">Ask me anything about insurance, your policies, or claims.</p>
+            </div>
+        </div>
+        
+        <!-- Input Area -->
+        <div class="border-t border-gray-200 p-3 bg-white">
+            <form id="chat-widget-form" class="flex gap-2">
+                <div class="flex-1 flex gap-2">
+                    <input
+                        type="text"
+                        id="chat-widget-input"
+                        placeholder="Type your message..."
+                        class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        autocomplete="off"
+                    />
+                    <button
+                        type="button"
+                        id="chat-widget-mic"
+                        class="chat-widget-mic px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        title="Click to speak"
+                    >
+                        <svg id="chat-widget-mic-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                        </svg>
+                        <svg id="chat-widget-mic-stop-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <button
+                    type="submit"
+                    id="chat-widget-send"
+                    class="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm"
+                >
+                    <span id="chat-widget-send-text">Send</span>
+                    <span id="chat-widget-send-loading" class="hidden">
+                        <svg class="animate-spin h-4 w-4 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </span>
+                </button>
+            </form>
+            <div id="chat-widget-speech-status" class="mt-1 text-xs text-gray-500 hidden"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #chat-widget {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .chat-widget-mic.recording {
+        background-color: #ef4444 !important;
+        color: white !important;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
+        }
+    }
+    
+    .chat-widget-message-user {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 18px 18px 4px 18px;
+    }
+    
+    .chat-widget-message-assistant {
+        background: #f3f4f6;
+        color: #1f2937;
+        border-radius: 18px 18px 18px 4px;
+    }
+    
+    .chat-widget-markdown-content {
+        line-height: 1.6;
+        font-size: 0.875rem;
+    }
+    
+    .chat-widget-markdown-content p {
+        margin-bottom: 0.5rem;
+    }
+    
+    .chat-widget-markdown-content ul, .chat-widget-markdown-content ol {
+        margin-left: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .chat-widget-markdown-content code {
+        background-color: rgba(0, 0, 0, 0.1);
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-size: 0.85em;
+    }
+    
+    .chat-widget-speaker-button {
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+    
+    .chat-widget-speaker-button:hover {
+        opacity: 1;
+    }
+    
+    .chat-widget-speaker-button.playing {
+        opacity: 1;
+        color: #667eea;
+    }
+    
+    @keyframes slideUp {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    #chat-window {
+        animation: slideUp 0.3s ease-out;
+    }
+</style>
+
+<script>
+// Chat Widget JavaScript
+(function() {
+    const AI_AGENT_URL = '{{ ai_agent_url }}';
+    const USER_ID = '{{ user_id }}';
+    const POLICY_NUMBER = '{{ policy_number or "" }}';
+    
+    const chatWidget = document.getElementById('chat-widget');
+    const chatToggle = document.getElementById('chat-widget-toggle');
+    const chatWindow = document.getElementById('chat-window');
+    const chatIcon = document.getElementById('chat-icon');
+    const closeIcon = document.getElementById('close-icon');
+    const minimizeBtn = document.getElementById('chat-window-minimize');
+    const messagesContainer = document.getElementById('chat-widget-messages');
+    const chatForm = document.getElementById('chat-widget-form');
+    const chatInput = document.getElementById('chat-widget-input');
+    const chatSend = document.getElementById('chat-widget-send');
+    const chatSendText = document.getElementById('chat-widget-send-text');
+    const chatSendLoading = document.getElementById('chat-widget-send-loading');
+    const chatMic = document.getElementById('chat-widget-mic');
+    const chatMicIcon = document.getElementById('chat-widget-mic-icon');
+    const chatMicStopIcon = document.getElementById('chat-widget-mic-stop-icon');
+    const speechStatus = document.getElementById('chat-widget-speech-status');
+    
+    let isOpen = false;
+    let messages = [];
+    let abortController = null;
+    let recognition = null;
+    let isRecording = false;
+    let currentUtterance = null;
+    let isLoading = false;
+    
+    // Toggle chat window
+    function toggleChat() {
+        isOpen = !isOpen;
+        if (isOpen) {
+            chatWindow.classList.remove('hidden');
+            chatIcon.classList.add('hidden');
+            closeIcon.classList.remove('hidden');
+            chatInput.focus();
+        } else {
+            chatWindow.classList.add('hidden');
+            chatIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+        }
+    }
+    
+    chatToggle.addEventListener('click', toggleChat);
+    minimizeBtn.addEventListener('click', toggleChat);
+    
+    // Simple markdown renderer
+    function renderMarkdown(text) {
+        let html = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        
+        html = html
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            .replace(/`(.+?)`/g, '<code>$1</code>')
+            .replace(/\n/g, '<br>');
+        
+        return html;
+    }
+    
+    function addMessage(role, content, sources = []) {
+        const welcomeMsg = messagesContainer.querySelector('.text-center');
+        if (welcomeMsg) {
+            welcomeMsg.remove();
+        }
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+        
+        const messageContent = document.createElement('div');
+        messageContent.className = `max-w-[80%] px-3 py-2 text-sm ${role === 'user' ? 'chat-widget-message-user' : 'chat-widget-message-assistant'}`;
+        
+        if (role === 'assistant') {
+            const speakerButton = document.createElement('button');
+            speakerButton.type = 'button';
+            speakerButton.className = 'chat-widget-speaker-button flex-shrink-0 p-1 rounded hover:bg-gray-200 focus:outline-none';
+            speakerButton.title = 'Listen to response';
+            speakerButton.setAttribute('data-text', content);
+            speakerButton.setAttribute('data-playing', 'false');
+            
+            // Speaker icon (play)
+            const speakerIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            speakerIcon.setAttribute('class', 'w-3 h-3');
+            speakerIcon.setAttribute('fill', 'none');
+            speakerIcon.setAttribute('stroke', 'currentColor');
+            speakerIcon.setAttribute('viewBox', '0 0 24 24');
+            speakerIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>';
+            
+            // Stop icon (hidden by default)
+            const stopIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            stopIcon.setAttribute('class', 'w-3 h-3 hidden');
+            stopIcon.setAttribute('fill', 'none');
+            stopIcon.setAttribute('stroke', 'currentColor');
+            stopIcon.setAttribute('viewBox', '0 0 24 24');
+            stopIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>';
+            
+            speakerButton.appendChild(speakerIcon);
+            speakerButton.appendChild(stopIcon);
+            
+            speakerButton.addEventListener('click', () => {
+                const isPlaying = speakerButton.getAttribute('data-playing') === 'true';
+                if (isPlaying) {
+                    // Stop audio
+                    stopAudio();
+                } else {
+                    // Play audio
+                    const textToSpeak = speakerButton.getAttribute('data-text');
+                    speakText(textToSpeak, speakerButton);
+                }
+            });
+            
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'flex items-start justify-between gap-2';
+            
+            const markdownDiv = document.createElement('div');
+            markdownDiv.className = 'flex-1 chat-widget-markdown-content';
+            markdownDiv.innerHTML = renderMarkdown(content);
+            
+            contentWrapper.appendChild(markdownDiv);
+            contentWrapper.appendChild(speakerButton);
+            messageContent.appendChild(contentWrapper);
+            
+            if (sources.length > 0) {
+                const sourcesDiv = document.createElement('div');
+                sourcesDiv.className = 'mt-2 pt-2 border-t border-gray-300';
+                sourcesDiv.innerHTML = `
+                    <p class="text-xs font-semibold mb-1 text-gray-600">Sources:</p>
+                    <ul class="text-xs space-y-1 text-gray-500">
+                        ${sources.map(src => `<li>• ${src.split('/').pop()}</li>`).join('')}
+                    </ul>
+                `;
+                messageContent.appendChild(sourcesDiv);
+            }
+        } else {
+            messageContent.textContent = content;
+        }
+        
+        messageDiv.appendChild(messageContent);
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        return messageDiv;
+    }
+    
+    function updateLastMessage(content) {
+        const lastMessage = messagesContainer.querySelector('.chat-widget-message-assistant:last-of-type');
+        if (lastMessage) {
+            const contentDiv = lastMessage.querySelector('.chat-widget-markdown-content');
+            if (contentDiv) {
+                contentDiv.innerHTML = renderMarkdown(content);
+            }
+            const speakerButton = lastMessage.querySelector('.chat-widget-speaker-button');
+            if (speakerButton) {
+                speakerButton.setAttribute('data-text', content);
+            }
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    }
+    
+    function setLoading(loading) {
+        isLoading = loading;
+        chatInput.disabled = loading;
+        // Don't disable the button - we need it clickable for Cancel
+        
+        if (loading) {
+            // Show Cancel button with spinner
+            chatSendText.textContent = 'Cancel';
+            chatSendText.classList.remove('hidden');
+            chatSendLoading.classList.remove('hidden');
+            chatSend.classList.remove('from-purple-500', 'to-purple-600', 'hover:from-purple-600', 'hover:to-purple-700');
+            chatSend.classList.add('bg-red-500', 'hover:bg-red-600', 'from-red-500', 'to-red-600');
+        } else {
+            // Show Send button
+            chatSendText.textContent = 'Send';
+            chatSendText.classList.remove('hidden');
+            chatSendLoading.classList.add('hidden');
+            chatSend.classList.remove('bg-red-500', 'hover:bg-red-600', 'from-red-500', 'to-red-600');
+            chatSend.classList.add('from-purple-500', 'to-purple-600', 'hover:from-purple-600', 'hover:to-purple-700');
+        }
+    }
+    
+    function handleCancel() {
+        if (abortController) {
+            abortController.abort();
+            setLoading(false);
+            
+            // Update the last assistant message to indicate it was cancelled
+            const lastMessage = messagesContainer.querySelector('.chat-widget-message-assistant:last-of-type');
+            if (lastMessage) {
+                const contentDiv = lastMessage.querySelector('.chat-widget-markdown-content');
+                if (contentDiv && !contentDiv.textContent.trim()) {
+                    // Remove empty message if nothing was received
+                    lastMessage.parentElement.remove();
+                } else if (contentDiv) {
+                    // Keep partial response but mark as cancelled
+                    contentDiv.innerHTML += '<br><br><em class="text-gray-500 text-xs">Query cancelled by user.</em>';
+                }
+            }
+            
+            abortController = null;
+            
+            // Focus input after cancel
+            setTimeout(() => {
+                chatInput.focus();
+            }, 100);
+        }
+    }
+    
+    async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message || isLoading) {
+            return;
+        }
+        
+        addMessage('user', message);
+        chatInput.value = '';
+        
+        const assistantMessageDiv = addMessage('assistant', '');
+        // Store reference to the markdown content div for this message
+        const assistantMarkdownDiv = assistantMessageDiv.querySelector('.chat-widget-markdown-content');
+        const assistantSpeakerButton = assistantMessageDiv.querySelector('.chat-widget-speaker-button');
+        let accumulatedContent = '';
+        let sources = [];
+        let queryType = null;
+        
+        const chatMessages = messages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+        }));
+        chatMessages.push({ role: 'user', content: message });
+        
+        abortController = new AbortController();
+        setLoading(true);
+        
+        const requestPayload = {
+            messages: chatMessages,
+            user_id: USER_ID,
+            top_k: 3,
+            temperature: 0.1
+        };
+        
+        // Include policy_number if user is logged in and has one
+        if (POLICY_NUMBER && POLICY_NUMBER !== '') {
+            requestPayload.policy_number = POLICY_NUMBER;
+        }
+        
+        console.log("📤 AI Agent Request:", {
+            request: requestPayload,
+            timestamp: new Date().toISOString(),
+        });
+        
+        try {
+            const response = await fetch(`${AI_AGENT_URL}/api/agent/chat/stream`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestPayload),
+                signal: abortController.signal
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            
+            while (true) {
+                if (abortController.signal.aborted) {
+                    reader.cancel();
+                    break;
+                }
+                
+                const { done, value } = await reader.read();
+                if (done) break;
+                
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || '';
+                
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const data = JSON.parse(line.slice(6));
+                            
+                            if (data.error) {
+                                throw new Error(data.error);
+                            }
+                            
+                            if (data.chunk) {
+                                accumulatedContent += data.chunk;
+                                // Update the specific assistant message we're building
+                                if (assistantMarkdownDiv) {
+                                    assistantMarkdownDiv.innerHTML = renderMarkdown(accumulatedContent);
+                                }
+                                if (assistantSpeakerButton) {
+                                    assistantSpeakerButton.setAttribute('data-text', accumulatedContent);
+                                }
+                                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                            }
+                            
+                            if (data.done) {
+                                sources = data.sources || [];
+                                queryType = data.query_type;
+                                break;
+                            }
+                        } catch (e) {
+                            continue;
+                        }
+                    }
+                }
+            }
+            
+            if (accumulatedContent) {
+                // Final update to ensure content is set
+                if (assistantMarkdownDiv) {
+                    assistantMarkdownDiv.innerHTML = renderMarkdown(accumulatedContent);
+                }
+                if (assistantSpeakerButton) {
+                    assistantSpeakerButton.setAttribute('data-text', accumulatedContent);
+                }
+                
+                // Add sources if present
+                if (sources.length > 0 && !assistantMessageDiv.querySelector('.mt-2.pt-2')) {
+                    const messageContent = assistantMessageDiv.querySelector('.chat-widget-message-assistant');
+                    if (messageContent) {
+                        const sourcesDiv = document.createElement('div');
+                        sourcesDiv.className = 'mt-2 pt-2 border-t border-gray-300';
+                        sourcesDiv.innerHTML = `
+                            <p class="text-xs font-semibold mb-1 text-gray-600">Sources:</p>
+                            <ul class="text-xs space-y-1 text-gray-500">
+                                ${sources.map(src => `<li>• ${src.split('/').pop()}</li>`).join('')}
+                            </ul>
+                        `;
+                        messageContent.appendChild(sourcesDiv);
+                    }
+                }
+            }
+            
+            messages.push({ role: 'user', content: message });
+            messages.push({ role: 'assistant', content: accumulatedContent });
+            
+            console.log("📥 AI Agent Response:", {
+                answer: accumulatedContent,
+                sources: sources,
+                query_type: queryType,
+                timestamp: new Date().toISOString(),
+            });
+            
+            // Focus input after response completes
+            setTimeout(() => {
+                chatInput.focus();
+            }, 100);
+            
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                // User cancelled - handleCancel already handled the UI update
+                console.log("Streaming chat cancelled by user");
+                // Focus input after cancel
+                setTimeout(() => {
+                    chatInput.focus();
+                }, 100);
+            } else {
+                console.error("Chat error:", error);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-xs';
+                errorDiv.textContent = `Error: ${error.message}`;
+                messagesContainer.appendChild(errorDiv);
+                
+                // Focus input after error
+                setTimeout(() => {
+                    chatInput.focus();
+                }, 100);
+            }
+        } finally {
+            if (!abortController || !abortController.signal.aborted) {
+                setLoading(false);
+                abortController = null;
+            }
+        }
+    }
+    
+    // Handle send button click directly (for Cancel functionality)
+    chatSend.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (isLoading && abortController) {
+            // Cancel request
+            handleCancel();
+        } else if (!isLoading) {
+            // Send message
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+    });
+    
+    chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (isLoading && abortController) {
+            // Cancel request
+            handleCancel();
+        } else if (!isLoading) {
+            sendMessage();
+        }
+    });
+    
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (isLoading && abortController) {
+                // Cancel request
+                handleCancel();
+            } else if (!isLoading) {
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        }
+    });
+    
+    // Speech Recognition
+    function initSpeechRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!SpeechRecognition) {
+            chatMic.disabled = true;
+            return;
+        }
+        
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        // Increase timeout to give users more time to speak
+        // Note: Some browsers may not support this property
+        if ('serviceURI' in recognition) {
+            recognition.serviceURI = 'wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/voices/list?trustedclienttoken=6A5AA1D4EAFF4E9FB37E23D68491D6F4';
+        }
+        
+        recognition.onstart = () => {
+            isRecording = true;
+            chatMic.classList.add('recording');
+            chatMicIcon.classList.add('hidden');
+            chatMicStopIcon.classList.remove('hidden');
+            speechStatus.textContent = 'Listening...';
+            speechStatus.classList.remove('hidden');
+        };
+        
+        recognition.onresult = (event) => {
+            let interimTranscript = '';
+            let finalTranscript = '';
+            
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript + ' ';
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+            
+            chatInput.value = finalTranscript + interimTranscript;
+            
+            if (finalTranscript) {
+                speechStatus.textContent = 'Processing...';
+            } else if (interimTranscript) {
+                speechStatus.textContent = 'Listening: ' + interimTranscript;
+            }
+        };
+        
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            isRecording = false;
+            chatMic.classList.remove('recording');
+            chatMicIcon.classList.remove('hidden');
+            chatMicStopIcon.classList.add('hidden');
+            
+            // Handle different error types with user-friendly messages
+            let errorMsg = '';
+            if (event.error === 'no-speech') {
+                errorMsg = 'No speech detected. Please try again and speak clearly.';
+            } else if (event.error === 'audio-capture') {
+                errorMsg = 'Microphone not found. Please check your device.';
+            } else if (event.error === 'not-allowed') {
+                errorMsg = 'Microphone permission denied. Please allow microphone access.';
+            } else if (event.error === 'aborted') {
+                // User cancelled - don't show error
+                speechStatus.classList.add('hidden');
+                return;
+            } else {
+                errorMsg = `Speech recognition error: ${event.error}`;
+            }
+            
+            if (errorMsg) {
+                speechStatus.textContent = errorMsg;
+                speechStatus.classList.remove('hidden');
+                setTimeout(() => {
+                    speechStatus.classList.add('hidden');
+                }, 4000);
+            }
+        };
+        
+        recognition.onend = () => {
+            isRecording = false;
+            chatMic.classList.remove('recording');
+            chatMicIcon.classList.remove('hidden');
+            chatMicStopIcon.classList.add('hidden');
+            if (chatInput.value.trim()) {
+                speechStatus.textContent = 'Ready to send';
+                setTimeout(() => {
+                    speechStatus.classList.add('hidden');
+                }, 2000);
+            } else {
+                speechStatus.classList.add('hidden');
+            }
+        };
+    }
+    
+    function stopAudio() {
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+        currentUtterance = null;
+        
+        // Update all speaker buttons to show play icon
+        const speakerButtons = document.querySelectorAll('.chat-widget-speaker-button');
+        speakerButtons.forEach(btn => {
+            btn.setAttribute('data-playing', 'false');
+            btn.classList.remove('playing');
+            btn.title = 'Listen to response';
+            const speakerIcon = btn.querySelector('svg:first-child');
+            const stopIcon = btn.querySelector('svg:last-child');
+            if (speakerIcon) speakerIcon.classList.remove('hidden');
+            if (stopIcon) stopIcon.classList.add('hidden');
+        });
+    }
+    
+    function speakText(text, button = null) {
+        // Stop any currently playing audio
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+        
+        const cleanText = text
+            .replace(/\*\*(.+?)\*\*/g, '$1')
+            .replace(/\*(.+?)\*/g, '$1')
+            .replace(/`(.+?)`/g, '$1')
+            .replace(/#{1,6}\s+/g, '')
+            .replace(/\n+/g, '. ')
+            .trim();
+        
+        if (!cleanText) return;
+        
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = 'en-US';
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        const speakerButtons = document.querySelectorAll('.chat-widget-speaker-button');
+        let currentButton = button;
+        
+        // If no button provided, find the one matching the text
+        if (!currentButton) {
+            speakerButtons.forEach(btn => {
+                if (btn.getAttribute('data-text') === text) {
+                    currentButton = btn;
+                }
+            });
+        }
+        
+        utterance.onstart = () => {
+            // Reset all buttons first
+            speakerButtons.forEach(btn => {
+                btn.setAttribute('data-playing', 'false');
+                btn.classList.remove('playing');
+                btn.title = 'Listen to response';
+                const speakerIcon = btn.querySelector('svg:first-child');
+                const stopIcon = btn.querySelector('svg:last-child');
+                if (speakerIcon) speakerIcon.classList.remove('hidden');
+                if (stopIcon) stopIcon.classList.add('hidden');
+            });
+            
+            // Set current button to playing state
+            if (currentButton) {
+                currentButton.setAttribute('data-playing', 'true');
+                currentButton.classList.add('playing');
+                currentButton.title = 'Stop playback';
+                const speakerIcon = currentButton.querySelector('svg:first-child');
+                const stopIcon = currentButton.querySelector('svg:last-child');
+                if (speakerIcon) speakerIcon.classList.add('hidden');
+                if (stopIcon) stopIcon.classList.remove('hidden');
+            }
+        };
+        
+        utterance.onend = () => {
+            if (currentButton) {
+                currentButton.setAttribute('data-playing', 'false');
+                currentButton.classList.remove('playing');
+                currentButton.title = 'Listen to response';
+                const speakerIcon = currentButton.querySelector('svg:first-child');
+                const stopIcon = currentButton.querySelector('svg:last-child');
+                if (speakerIcon) speakerIcon.classList.remove('hidden');
+                if (stopIcon) stopIcon.classList.add('hidden');
+            }
+            currentUtterance = null;
+        };
+        
+        utterance.onerror = (event) => {
+            console.error('Speech synthesis error:', event);
+            if (currentButton) {
+                currentButton.setAttribute('data-playing', 'false');
+                currentButton.classList.remove('playing');
+                currentButton.title = 'Listen to response';
+                const speakerIcon = currentButton.querySelector('svg:first-child');
+                const stopIcon = currentButton.querySelector('svg:last-child');
+                if (speakerIcon) speakerIcon.classList.remove('hidden');
+                if (stopIcon) stopIcon.classList.add('hidden');
+            }
+            currentUtterance = null;
+        };
+        
+        currentUtterance = utterance;
+        window.speechSynthesis.speak(utterance);
+    }
+    
+    chatMic.addEventListener('click', () => {
+        if (!recognition) {
+            alert('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
+            return;
+        }
+        
+        if (isRecording) {
+            recognition.stop();
+        } else {
+            try {
+                // Request microphone permission first (if not already granted)
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ audio: true })
+                        .then(() => {
+                            // Permission granted, start recognition
+                            recognition.start();
+                        })
+                        .catch((err) => {
+                            console.error('Microphone permission error:', err);
+                            speechStatus.textContent = 'Microphone permission required. Please allow access and try again.';
+                            speechStatus.classList.remove('hidden');
+                            setTimeout(() => {
+                                speechStatus.classList.add('hidden');
+                            }, 4000);
+                        });
+                } else {
+                    // Fallback for browsers that don't support getUserMedia
+                    recognition.start();
+                }
+            } catch (error) {
+                console.error('Error starting recognition:', error);
+                speechStatus.textContent = 'Error starting speech recognition. Please try again.';
+                speechStatus.classList.remove('hidden');
+                setTimeout(() => {
+                    speechStatus.classList.add('hidden');
+                }, 3000);
+            }
+        }
+    });
+    
+    initSpeechRecognition();
+    
+    window.addEventListener('beforeunload', () => {
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+        if (recognition && isRecording) {
+            recognition.stop();
+        }
+    });
+})();
+</script>
+

@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+{% block title %}AI Agent Insure — Insurance for Agentic AI Builders{% endblock %}
+
+{% block extra_head %}
+<style>
+    .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+    
+    .glass-nav {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .glass-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-overlay.active {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 1rem;
+        padding: 2rem;
+        max-width: 28rem;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .close-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .close-modal:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="gradient-bg">
+    <!-- Navigation -->
+    <header class="glass-nav sticky top-4 z-50 mx-4 mt-4 rounded-full px-6 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="{{ url_for('static', filename='shield.png') }}" alt="AI Agent Insure Logo" class="h-10 w-10">
+                <div class="flex flex-col">
+                    <span class="text-white font-semibold text-lg">AI Agent Insure</span>
+                    <span class="text-white/70 text-xs">Insurance for Agentic AI Builders</span>
+                </div>
+            </div>
+            <nav class="flex items-center gap-6">
+                <a href="#products" class="text-white/80 hover:text-white text-sm transition">Products</a>
+                <a href="#why" class="text-white/80 hover:text-white text-sm transition">Why now</a>
+                <a href="#how-it-works" class="text-white/80 hover:text-white text-sm transition">How it works</a>
+                <a href="#contact" class="text-white/80 hover:text-white text-sm transition">Talk to us</a>
+                {% if session.access_token %}
+                <a href="{{ url_for('dashboard') }}" class="text-white/80 hover:text-white text-sm transition">Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="text-white/80 hover:text-white text-sm transition">Logout</a>
+                {% else %}
+                <button onclick="openModal('loginModal')" class="text-white/80 hover:text-white text-sm transition">Login</button>
+                <button onclick="openModal('registerModal')" class="bg-white text-purple-600 px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition text-sm">Register</button>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Hero Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-16">
+            <div class="text-white">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">De-risk your agentic AI stack.</h1>
+                <p class="text-lg text-white/90 mb-6 max-w-xl">
+                    AI-native coverage for teams shipping autonomous agents, RAG systems, and AI-first products.
+                    Translate model, data, and workflow risk into clear, predictable insurance.
+                </p>
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <a href="#contact" class="bg-white text-purple-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition shadow-lg">Request a coverage review</a>
+                    <a href="#products" class="bg-transparent border-2 border-white/60 text-white px-6 py-3 rounded-full font-semibold hover:bg-white/10 transition">Explore products</a>
+                </div>
+                <div class="flex flex-wrap gap-4 text-sm text-white/80">
+                    <span>✔ Built for RAG, agents & AVs</span>
+                    <span>✔ Designed with AI security & risk teams</span>
+                </div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 shadow-2xl">
+                <div class="text-white/70 text-xs uppercase tracking-wider mb-4">Live Agentic Risk Snapshot</div>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-baseline">
+                        <span class="text-white/75 text-sm">Agent workflows protected</span>
+                        <span class="text-white text-2xl font-semibold">128+</span>
+                    </div>
+                    <div class="flex justify-between items-baseline">
+                        <span class="text-white/75 text-sm">Average incident containment</span>
+                        <span class="text-white text-2xl font-semibold">9 min</span>
+                    </div>
+                    <div class="flex justify-between items-baseline">
+                        <span class="text-white/75 text-sm">AI-native products covered</span>
+                        <span class="text-white text-2xl font-semibold">42</span>
+                    </div>
+                    <div class="mt-4 p-3 rounded-full bg-white/10 flex items-center gap-2 text-sm text-white/90">
+                        <span class="w-2 h-2 bg-green-400 rounded-full shadow-lg shadow-green-400/50"></span>
+                        Real-world coverage for RAG, multi-agent systems, AVs & robotics.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="mb-16">
+            <h2 class="text-3xl font-bold text-white mb-2">Coverage designed for agentic AI systems</h2>
+            <p class="text-white/80 text-lg mb-8 max-w-2xl">
+                From hallucinating copilots to unsupervised multi-agent workflows, AI Agent Insure
+                turns complex technical failure modes into clear, underwritten coverage.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <article class="glass-card rounded-xl p-6 card-hover">
+                    <h3 class="text-xl font-bold text-white mb-3">Agentic AI Liability</h3>
+                    <p class="text-white/80 text-sm mb-4">
+                        Covers downstream harm from autonomous or semi-autonomous AI decisions, including hallucinations,
+                        misaligned actions, and faulty recommendations.
+                    </p>
+                    <ul class="text-white/70 text-sm space-y-1 list-disc list-inside">
+                        <li>Customer-facing and internal agents</li>
+                        <li>RAG-based copilots and assistants</li>
+                        <li>Regulatory & reputational protection</li>
+                    </ul>
+                </article>
+                <article class="glass-card rounded-xl p-6 card-hover">
+                    <h3 class="text-xl font-bold text-white mb-3">Autonomous Systems & Robotics</h3>
+                    <p class="text-white/80 text-sm mb-4">
+                        Purpose-built coverage for AVs, drones, warehouse robotics, and industrial automation controlled by AI.
+                    </p>
+                    <ul class="text-white/70 text-sm space-y-1 list-disc list-inside">
+                        <li>Navigation & perception failures</li>
+                        <li>Hardware–software integration issues</li>
+                        <li>Operational downtime add-ons</li>
+                    </ul>
+                </article>
+                <article class="glass-card rounded-xl p-6 card-hover">
+                    <h3 class="text-xl font-bold text-white mb-3">Model, Data & Infra Security</h3>
+                    <p class="text-white/80 text-sm mb-4">
+                        Protects your AI stack: training data, embeddings, vector stores, model endpoints, and orchestration layers.
+                    </p>
+                    <ul class="text-white/70 text-sm space-y-1 list-disc list-inside">
+                        <li>Prompt injection & data poisoning</li>
+                        <li>Model exfiltration and endpoint abuse</li>
+                        <li>Vector DB & RAG corruption incidents</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <!-- Why Now Section -->
+        <section id="why" class="glass-card rounded-2xl p-8 mb-16">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-4">Why AI-native insurance now?</h2>
+                    <p class="text-white/80 mb-4">
+                        Traditional cyber and E&O products were not built for agentic systems that act, learn,
+                        and route tasks autonomously. As your AI surface area grows, blind spots multiply.
+                    </p>
+                    <p class="text-white/80">
+                        AI Agent Insure translates failure modes your engineers and risk teams talk about every day
+                        into an underwriting language your board and regulators understand.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-4">Built around how you ship AI</h3>
+                    <ul class="text-white/80 space-y-2 list-disc list-inside">
+                        <li>Underwriting aligned to your RAG & agent architecture</li>
+                        <li>Coverage that evolves with new models and tools</li>
+                        <li>Support for internal, customer-facing, and partner-facing agents</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="mb-16">
+            <h2 class="text-3xl font-bold text-white mb-8">How it works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-card rounded-xl p-6">
+                    <div class="w-8 h-8 rounded-full border-2 border-white/60 flex items-center justify-center text-white text-sm font-semibold mb-4">01</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Map your agentic risk surface</h3>
+                    <p class="text-white/80 text-sm">
+                        We work with your engineering, security, and legal teams to inventory models, data flows,
+                        agent workflows, and critical dependencies.
+                    </p>
+                </div>
+                <div class="glass-card rounded-xl p-6">
+                    <div class="w-8 h-8 rounded-full border-2 border-white/60 flex items-center justify-center text-white text-sm font-semibold mb-4">02</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Design coverage around your stack</h3>
+                    <p class="text-white/80 text-sm">
+                        We align policy structure to how your systems actually behave: RAG pipelines, tool-calling agents,
+                        autonomous vehicles, and multi-agent orchestrators.
+                    </p>
+                </div>
+                <div class="glass-card rounded-xl p-6">
+                    <div class="w-8 h-8 rounded-full border-2 border-white/60 flex items-center justify-center text-white text-sm font-semibold mb-4">03</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Deploy & iterate with you</h3>
+                    <p class="text-white/80 text-sm">
+                        As you ship new agents, swap models, or expand into new geos, we revisit limits, exclusions,
+                        and incident playbooks with your team.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="glass-card rounded-2xl p-8 mb-16">
+            <h2 class="text-3xl font-bold text-white mb-4">Ready to insure your next generation of AI agents?</h2>
+            <p class="text-white/80 mb-6 max-w-2xl">
+                Share a brief snapshot of your AI footprint — models, agents, and infrastructure — and our team
+                will respond with a tailored coverage outline.
+            </p>
+            <form class="space-y-4" onsubmit="event.preventDefault(); alert('This demo form does not submit. In production, connect it to your backend or CRM.');">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="name" class="block text-white/90 text-sm font-medium mb-2">Name</label>
+                        <input type="text" id="name" name="name" placeholder="Your name" required
+                            class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50">
+                    </div>
+                    <div>
+                        <label for="company" class="block text-white/90 text-sm font-medium mb-2">Company</label>
+                        <input type="text" id="company" name="company" placeholder="Your company" required
+                            class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="contact_email" class="block text-white/90 text-sm font-medium mb-2">Work email</label>
+                        <input type="email" id="contact_email" name="contact_email" placeholder="you@company.com" required
+                            class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50">
+                    </div>
+                    <div>
+                        <label for="role" class="block text-white/90 text-sm font-medium mb-2">Role</label>
+                        <input type="text" id="role" name="role" placeholder="e.g. Head of AI, CTO, CISO"
+                            class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50">
+                    </div>
+                </div>
+                <div>
+                    <label for="footprint" class="block text-white/90 text-sm font-medium mb-2">AI footprint</label>
+                    <textarea id="footprint" name="footprint" rows="4" placeholder="Share a quick overview: agent types, RAG use cases, AV/robotics, key regions..."
+                        class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-white text-purple-600 py-3 px-6 rounded-full font-semibold hover:bg-gray-100 transition shadow-lg">
+                    Get a coverage outline
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-white/20">
+        <div class="flex flex-wrap justify-between items-center text-white/70 text-sm">
+            <span>© {{ current_year }} AI Agent Insure. All rights reserved.</span>
+            <span class="text-white/60">Fictional company — demo landing page for agentic AI insurance.</span>
+        </div>
+    </footer>
+</div>
+
+<!-- Login Modal -->
+<div id="loginModal" class="modal-overlay">
+    <div class="modal-content relative">
+        <button class="close-modal" onclick="closeModal('loginModal')">&times;</button>
+        <div class="text-center mb-6">
+            <img src="{{ url_for('static', filename='shield.png') }}" alt="Logo" class="mx-auto h-16 w-16 mb-4">
+            <h2 class="text-3xl font-bold text-white">Welcome Back</h2>
+            <p class="mt-2 text-white/80">Sign in to your account</p>
+        </div>
+        <form method="POST" action="{{ url_for('login') }}" class="space-y-4">
+            <div>
+                <label for="modal_username" class="block text-sm font-medium text-white mb-2">Username</label>
+                <input type="text" id="modal_username" name="username" required autocomplete="username"
+                    class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    placeholder="Enter your username">
+            </div>
+            <div>
+                <label for="modal_password" class="block text-sm font-medium text-white mb-2">Password</label>
+                <input type="password" id="modal_password" name="password" required autocomplete="current-password"
+                    class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    placeholder="Enter your password">
+            </div>
+            <button type="submit" class="w-full bg-white text-purple-600 py-3 px-4 rounded-lg font-semibold hover:bg-gray-100 transition shadow-lg">
+                Sign In
+            </button>
+        </form>
+        <div class="mt-4 text-center">
+            <p class="text-white/80 text-sm">
+                Don't have an account? 
+                <button onclick="closeModal('loginModal'); openModal('registerModal');" class="text-white font-semibold hover:underline">Register here</button>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Register Modal -->
+<div id="registerModal" class="modal-overlay">
+    <div class="modal-content relative">
+        <button class="close-modal" onclick="closeModal('registerModal')">&times;</button>
+        <div class="text-center mb-6">
+            <img src="{{ url_for('static', filename='shield.png') }}" alt="Logo" class="mx-auto h-16 w-16 mb-4">
+            <h2 class="text-3xl font-bold text-white">Create Account</h2>
+            <p class="mt-2 text-white/80">Register with your policy information</p>
+        </div>
+        <form method="POST" action="{{ url_for('register') }}" class="space-y-4">
+            <div>
+                <label for="modal_reg_username" class="block text-sm font-medium text-white mb-2">Username</label>
+                <input type="text" id="modal_reg_username" name="username" required minlength="3" autocomplete="username"
+                    class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    placeholder="Choose a username">
+            </div>
+            <div>
+                <label for="modal_reg_email" class="block text-sm font-medium text-white mb-2">Email</label>
+                <input type="email" id="modal_reg_email" name="email" required autocomplete="email"
+                    class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    placeholder="your.email@example.com">
+            </div>
+            <div>
+                <label for="modal_reg_password" class="block text-sm font-medium text-white mb-2">Password</label>
+                <input type="password" id="modal_reg_password" name="password" required minlength="8" autocomplete="new-password"
+                    class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    placeholder="Minimum 8 characters">
+            </div>
+            <div>
+                <label for="modal_reg_policy" class="block text-sm font-medium text-white mb-2">Policy Number</label>
+                <input type="text" id="modal_reg_policy" name="policy_number" required
+                    class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    placeholder="Your policy number">
+                <p class="mt-1 text-xs text-white/60">Enter the policy number associated with your email</p>
+            </div>
+            <button type="submit" class="w-full bg-white text-purple-600 py-3 px-4 rounded-lg font-semibold hover:bg-gray-100 transition shadow-lg">
+                Create Account
+            </button>
+        </form>
+        <div class="mt-4 text-center">
+            <p class="text-white/80 text-sm">
+                Already have an account? 
+                <button onclick="closeModal('registerModal'); openModal('loginModal');" class="text-white font-semibold hover:underline">Sign in here</button>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.add('active');
+    }
+    
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+    }
+    
+    // Check for query parameter to show modal on page load
+    window.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const show = urlParams.get('show');
+        if (show === 'login') {
+            openModal('loginModal');
+            // Clean up URL by removing the query parameter
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else if (show === 'register') {
+            openModal('registerModal');
+            // Clean up URL by removing the query parameter
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    });
+    
+    // Close modal when clicking outside
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+    });
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
+
