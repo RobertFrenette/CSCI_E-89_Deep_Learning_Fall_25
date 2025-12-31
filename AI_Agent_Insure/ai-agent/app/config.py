@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     
     # RAG Settings
     rag_top_k: int = 3  # Reduced for faster retrieval and processing
-    rag_max_context_length: int = 2500  # Optimized for phi3:mini efficiency
+    rag_max_context_length: int = 3000  # Optimized for phi3:mini efficiency
     rag_temperature: float = 0.1  # Very low for highly factual, deterministic responses
     
     # CORS

@@ -361,7 +361,10 @@ function speakText(text) {
     };
     
     utterance.onerror = (event) => {
-        console.error('Speech synthesis error:', event);
+        // 'interrupted' error is expected when user stops audio - don't log it
+        if (event.error !== 'interrupted') {
+            console.error('Speech synthesis error:', event);
+        }
         if (currentButton) {
             currentButton.classList.remove('playing');
         }
